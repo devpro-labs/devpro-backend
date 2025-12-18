@@ -1,6 +1,2 @@
 /mvnw text eol=lf
 *.cmd text eol=crlf
-
-### VS Code ###
-.vscode/
-/.env
