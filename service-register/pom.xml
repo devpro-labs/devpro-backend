@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.devpro</groupId>
-	<artifactId>problem-service</artifactId>
+	<artifactId>service-register</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>problem-service</name>
-	<description>problem service</description>
+	<name>service-register</name>
+	<description>service registery for devpro-backend</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -32,30 +32,15 @@
 	</properties>
 	<dependencies>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-webmvc</artifactId>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
 		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-webmvc-test</artifactId>
+			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-
-<!--		eureka client -->
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-		</dependency>
-
-
-<!--		load balancing -->
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-loadbalancer</artifactId>
-		</dependency>
-
-
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
