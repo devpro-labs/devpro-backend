@@ -1,15 +1,23 @@
 spring:
   application:
     name: code-runner-service
+  cloud:
+    consul:
+      port: 8500
+      host: localhost
+      discovery:
+        register: true
+        instance-id: ${spring.application.name}-${server.port}
 
 #port
 server:
   port: 8083
 
-#eureka server configure
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka/
-  instance:
-    hostname: localhost
+#consul client
+
+#health check
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info

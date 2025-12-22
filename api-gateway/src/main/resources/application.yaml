@@ -9,36 +9,43 @@ spring:
         jwt:
           issuer-uri: ${JWT_ENDPOINT}
 
+  #gateway
   cloud:
     gateway:
       discovery:
+
         locator:
           enabled: true
       #configure routes
       routes:
-        - id: PROBLEM-SERVICE
+        - id: problem-service
           uri:
-            lb://PROBLEM-SERVICE
+            lb://problem-service
           predicates:
-            - Path=/api/problems/**
-        - id: USER_SERVICE
+            - Path=/api/admin/**
+        - id: user-service
           uri:
-            lb://USER_SERVICE
+            lb://user-service
           predicates:
             - Path=/api/user/**
 
 
-
-
-
-#enable eureka-server
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka/
-
+    #consul client
+    consul:
+      port: 8500
+      host: localhost
+      discovery:
+        instance-id: ${spring.application.name}-${server.port}
+        register: true
 
 
 #port
 server:
   port: 9000
+
+#health check
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info

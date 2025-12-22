@@ -2,12 +2,13 @@ package com.devpro.user_service.service;
 
 import com.devpro.user_service.model.User;
 import com.devpro.user_service.repository.UserRepository;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.ObjectMapper;
+
 import java.util.stream.Collectors;
 
 @Service
