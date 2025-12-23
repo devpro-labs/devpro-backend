@@ -8,6 +8,7 @@ import com.github.dockerjava.httpclient5.ApacheDockerHttpClient;
 import com.github.dockerjava.transport.DockerHttpClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.Duration;
 
@@ -30,5 +31,12 @@ public class DockerConfig {
 
         //both
         return DockerClientBuilder.getInstance(config).withDockerHttpClient(client).build();
+    }
+
+    //webClient config
+
+    @Bean
+    public WebClient webClient(){
+        return WebClient.builder().build();
     }
 }

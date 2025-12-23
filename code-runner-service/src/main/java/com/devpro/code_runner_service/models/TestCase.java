@@ -1,50 +1,36 @@
-package com.devpro.problem_service.model;
+package com.devpro.code_runner_service.models;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.util.UUID;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Type;
 
-@Entity
-@Table(name = "test_cases")
-@Data
-@NoArgsConstructor
+@Getter
+@Setter
 @AllArgsConstructor
+@NoArgsConstructor
 public class TestCase {
-
-    @Id
-    @GeneratedValue
     private UUID id;
 
     private UUID problemId;
 
-    @Type(JsonBinaryType.class)
-    @Column(columnDefinition = "jsonb")
     private JsonNode inputJson;
 
-    @Type(JsonBinaryType.class)
-    @Column(columnDefinition = "jsonb")
     private JsonNode expectedOutputJson;
 
     private String inputFileUrl;
     private String expectedOutputFileUrl;
 
-    @Enumerated(EnumType.STRING)
     private StorageType storageType;
 
     private Integer sizeKb;
     private Integer expectedStatus;
     private Boolean isHidden;
 
-    @Enumerated(EnumType.STRING)
     private Method method;
-
     private String endpoint;
 }
-
-

@@ -38,12 +38,21 @@ public class ProblemService {
     public Problem create(ProblemRequest request) throws JsonProcessingException {
         Problem p = new Problem();
         map(request, p);
+        p = repository.save(p);
 
         for (TestCaseRequest testCaseRequest : request.getTestCases()) {
-            testCaseService.create(testCaseRequest);
+            TestCaseRequest request1 = new TestCaseRequest();
+            request1.setProblemId(p.getId());
+            request1.setInput(testCaseRequest.getInput());
+            request1.setExpectedOutput(testCaseRequest.getExpectedOutput());
+            request1.setIsHidden(testCaseRequest.getIsHidden());
+            request1.setExpectedStatus(testCaseRequest.getExpectedStatus());
+            request1.setEndpoint(testCaseRequest.getEndpoint());
+            request1.setMethod(testCaseRequest.getMethod());
+            testCaseService.create(request1);
         }
 
-        return repository.save(p);
+        return p;
     }
     
     // READ ALL

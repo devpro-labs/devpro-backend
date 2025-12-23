@@ -1,9 +1,9 @@
-package com.devpro.code_runner_service.service;
+package com.devpro.code_runner_service.service.Imp;
 
 import com.devpro.code_runner_service.DTO.CustomResponse;
 import com.devpro.code_runner_service.DTO.DockerRunner;
 import com.devpro.code_runner_service.DTO.PreviewURL;
-import com.devpro.code_runner_service.repository.IDockerRepo;
+import com.devpro.code_runner_service.service.IDockerRepo;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.async.ResultCallback;
 import com.github.dockerjava.api.command.CreateContainerResponse;
@@ -365,7 +365,7 @@ public class DockerService implements IDockerRepo {
             int hostPort = Integer.parseInt(bindings[0].getHostPortSpec());
 
             // Only health-check for springboot
-            if (runner.getLibOrFramework().equals("springboot")) {
+//            if (runner.getLibOrFramework().equals("springboot")) {
                 int retries = 30;
                 boolean started = false;
                 while (retries-- > 0) {
@@ -375,7 +375,7 @@ public class DockerService implements IDockerRepo {
                         connection.setConnectTimeout(2000);
                         connection.setReadTimeout(2000);
                         int code = connection.getResponseCode();
-                        if (code == 200) {
+                        if (code >= 200 && code < 500) {
                             started = true;
                             break;
                         }
@@ -385,8 +385,8 @@ public class DockerService implements IDockerRepo {
                     Thread.sleep(1000);
                 }
 
-                if (!started) throw new RuntimeException("Spring Boot failed to start!");
-            }
+                if (!started) throw new RuntimeException(" failed to start!");
+//            }
 
             dockerClient.logContainerCmd(containerId)
                     .withStdOut(true)
@@ -398,16 +398,23 @@ public class DockerService implements IDockerRepo {
                         }
                     });
 
-            PreviewURL url = new PreviewURL("http://localhost:" + hostPort, containerId, hostPort);
+            PreviewURL url =  new PreviewURL("http://localhost:" + hostPort, containerId, hostPort);
+            Map<String, Object> DATA = new HashMap<>();
+            DATA.put("containerId", containerId);
+            DATA.put("fileName", runner.getFile_name());
+            DATA.put("url", url);
+            DATA.put("fileId", previewId);
 
-            List<Map<String, Object>> DATA = new ArrayList<>();
-            DATA.add(Map.of("message", "Container created successfully"));
-            DATA.add(Map.of("PreviewURL", url));
-            DATA.add(Map.of("fileId", previewId));
-            return new CustomResponse(DATA, "Success", 200, null);
+            return  new CustomResponse(
+                    DATA,
+                    "containered sucessfully build",
+                    200,
+                    "200"
+            );
+
         } catch (Exception e) {
             System.out.println(e);
-            return new CustomResponse(null, e.getMessage(), 400, null);
+            return null;
         }
     }
 
@@ -451,8 +458,8 @@ public class DockerService implements IDockerRepo {
             deleteRecursively(workdirPath);
 
             // Response
-            List<Map<String, Object>> DATA = new ArrayList<>();
-            DATA.add(Map.of("message", "Container and workdir deleted successfully"));
+            Map<String, Object> DATA = new HashMap<>();
+            DATA.put("message", "Container and workdir deleted successfully");
 
             return new CustomResponse(DATA, "Success", 200, null);
 

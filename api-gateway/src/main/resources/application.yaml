@@ -28,6 +28,11 @@ spring:
             lb://user-service
           predicates:
             - Path=/api/user/**
+        - id: code-runner-service
+          uri:
+            lb://code-runner-service
+          predicates:
+            - Path=/api/code-runner/**
 
 
     #consul client

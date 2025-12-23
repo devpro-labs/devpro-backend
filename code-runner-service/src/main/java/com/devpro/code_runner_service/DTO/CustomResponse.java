@@ -12,7 +12,7 @@ import java.util.Map;
 @AllArgsConstructor
 @ToString
 public class CustomResponse {
-    List<Map<String, Object>> DATA;
+    Map<String, Object> DATA;
     String MESSAGE;
     int STATUS;
     String ERROR;

@@ -2,6 +2,7 @@ package com.devpro.problem_service.dto;
 
 import java.util.UUID;
 
+import com.devpro.problem_service.model.Method;
 import lombok.Data;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -11,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TestCaseRequest {
 
-//    private UUID problemId;
+    private UUID problemId;
 
     // Raw input
     private String input;
@@ -20,4 +21,7 @@ public class TestCaseRequest {
     private Integer expectedStatus;
     private Boolean isHidden;
 //    private Integer weight;
+
+    private Method method;
+    private String endpoint;
 }

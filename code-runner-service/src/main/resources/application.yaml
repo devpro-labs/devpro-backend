@@ -8,6 +8,7 @@ spring:
       discovery:
         register: true
         instance-id: ${spring.application.name}-${server.port}
+        prefer-ip-address: true
 
 #port
 server:

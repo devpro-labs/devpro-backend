@@ -37,6 +37,9 @@ public class TestCaseService {
         tc.setExpectedStatus(request.getExpectedStatus());
         tc.setIsHidden(request.getIsHidden());
         tc.setSizeKb(sizeKb);
+        tc.setProblemId(request.getProblemId());
+        tc.setEndpoint(request.getEndpoint());
+        tc.setMethod(request.getMethod());
 
         if (sizeKb <= DB_LIMIT_KB) {
             tc.setStorageType(StorageType.DB);
