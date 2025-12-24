@@ -9,7 +9,7 @@ import java.util.List;
 
 @FeignClient(name = "problem-service")
 public interface TestCaseClient {
-    @GetMapping("/api/admin/test-cases/problem/{id}")
+    @GetMapping("/api/problems/test-cases/problem/{id}/raw")
     List<TestCase> getTestCases(
             @PathVariable("id") String problemId
     );

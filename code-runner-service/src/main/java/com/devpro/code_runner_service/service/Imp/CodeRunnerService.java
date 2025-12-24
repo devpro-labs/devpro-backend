@@ -28,7 +28,7 @@ public class CodeRunnerService implements ICodeRunner {
         CustomResponse response = dockerService.getPreviewURL(dockerRunner);
 
         //docker - response
-        Map<String, Object> data = response.getDATA();
+        Map<String, Object> data = response.getData();
         var cid  = data.get("containerId").toString();
         var fileId = data.get("fileId").toString();
         var fileName = data.get("fileName").toString();
@@ -51,7 +51,7 @@ public class CodeRunnerService implements ICodeRunner {
         CustomResponse response = dockerService.getPreviewURL(dockerRunner);
 
         //docker - response
-        Map<String, Object> data = response.getDATA();
+        Map<String, Object> data = response.getData();
         var cid  = data.get("containerId").toString();
         var fileId = data.get("fileId").toString();
         var fileName = data.get("fileName").toString();

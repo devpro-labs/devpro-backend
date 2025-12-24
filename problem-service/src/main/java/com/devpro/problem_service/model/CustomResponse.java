@@ -1,11 +1,9 @@
-package com.devpro.code_runner_service.DTO;
+package com.devpro.problem_service.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
-import java.util.List;
 import java.util.Map;
-
 
 
 @Getter

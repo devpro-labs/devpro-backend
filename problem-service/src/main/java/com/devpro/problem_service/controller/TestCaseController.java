@@ -3,6 +3,7 @@ package com.devpro.problem_service.controller;
 import java.util.List;
 import java.util.UUID;
 
+import com.devpro.problem_service.model.CustomResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,7 +20,7 @@ import com.devpro.problem_service.model.TestCase;
 import com.devpro.problem_service.service.TestCaseService;
 
 @RestController
-@RequestMapping("/api/admin/test-cases")
+@RequestMapping("/api/problems/test-cases")
 public class TestCaseController {
 
     private final TestCaseService service;
@@ -30,37 +31,47 @@ public class TestCaseController {
 
     // CREATE
     @PostMapping
-    public ResponseEntity<TestCase> create(
+    public CustomResponse create(
             @RequestBody TestCaseRequest request) throws JsonProcessingException {
-        return ResponseEntity.ok(service.create(request));
+        return service.create(request);
     }
 
     // READ BY ID
     @GetMapping("/{id}")
-    public ResponseEntity<TestCase> getById(@PathVariable UUID id) {
-        return ResponseEntity.ok(service.getById(id));
+    public CustomResponse getById(@PathVariable UUID id) {
+        return service.getById(id);
     }
 
     // READ BY PROBLEM
     @GetMapping("/problem/{problemId}")
-    public ResponseEntity<List<TestCase>> getByProblem(
+    public CustomResponse getByProblem(
             @PathVariable UUID problemId) {
-        return ResponseEntity.ok(service.getByProblem(problemId));
+        return service.getByProblem(problemId);
     }
 
     // UPDATE
     @PutMapping("/{id}")
-    public ResponseEntity<TestCase> update(
+    public CustomResponse update(
             @PathVariable UUID id,
             @RequestBody TestCaseRequest request) throws JsonProcessingException {
-        return ResponseEntity.ok(service.update(id, request));
+        return service.update(id, request);
     }
 
     // DELETE
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
-        service.delete(id);
-        return ResponseEntity.noContent().build();
+    public CustomResponse delete(@PathVariable UUID id) {
+        return service.delete(id);
+    }
+
+    @GetMapping("/sample/{id}")
+    public CustomResponse getSampleTestCases(@PathVariable UUID id){
+        return service.getSampleTestCases(id);
+    }
+
+    //raw
+    @GetMapping("/problem/{problemId}/raw")
+    public List<TestCase> getByProblemRaw(@PathVariable UUID problemId) {
+        return service.getTestCasesRaw(problemId);
     }
 }
 

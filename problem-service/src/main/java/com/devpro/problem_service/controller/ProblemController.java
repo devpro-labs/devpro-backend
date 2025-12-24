@@ -3,6 +3,7 @@ package com.devpro.problem_service.controller;
 import java.util.List;
 import java.util.UUID;
 
+import com.devpro.problem_service.model.CustomResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,7 +20,7 @@ import com.devpro.problem_service.model.Problem;
 import com.devpro.problem_service.service.ProblemService;
 
 @RestController
-@RequestMapping("/api/admin/problems")
+@RequestMapping("/api/problems")
 public class ProblemController {
 
     private final ProblemService service;
@@ -30,21 +31,21 @@ public class ProblemController {
 
     // CREATE
     @PostMapping
-    public ResponseEntity<Problem> create(
+    public CustomResponse create(
             @RequestBody ProblemRequest request) throws JsonProcessingException {
-        return ResponseEntity.ok(service.create(request));
+        return service.create(request);
     }
 
     // READ ALL
     @GetMapping
-    public ResponseEntity<List<Problem>> getAll() {
-        return ResponseEntity.ok(service.getAll());
+    public CustomResponse getAll() {
+        return service.getAll();
     }
 
     // READ BY ID
     @GetMapping("/{id}")
-    public ResponseEntity<Problem> getById(@PathVariable UUID id) {
-        return ResponseEntity.ok(service.getById(id));
+    public CustomResponse getById(@PathVariable UUID id) {
+        return service.getById(id);
     }
 
     // UPDATE

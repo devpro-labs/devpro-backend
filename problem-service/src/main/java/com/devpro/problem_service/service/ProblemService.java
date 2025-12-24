@@ -1,8 +1,10 @@
 package com.devpro.problem_service.service;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import com.devpro.problem_service.dto.TestCaseRequest;
+import com.devpro.problem_service.model.CustomResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +37,7 @@ public class ProblemService {
     }
 
  // CREATE
-    public Problem create(ProblemRequest request) throws JsonProcessingException {
+    public CustomResponse create(ProblemRequest request) throws JsonProcessingException {
         Problem p = new Problem();
         map(request, p);
         p = repository.save(p);
@@ -51,19 +53,39 @@ public class ProblemService {
             request1.setMethod(testCaseRequest.getMethod());
             testCaseService.create(request1);
         }
+        Map<String, Object> data = Map.of("problem",p);
 
-        return p;
+        return new CustomResponse(
+            data,
+                "Successfully created problem",
+                201,
+                ""
+        );
     }
     
     // READ ALL
-    public List<Problem> getAll() {
-        return repository.findAll();
+    public CustomResponse getAll() {
+        List<Problem> problems =  repository.findAll();
+        Map<String, Object> DATA = Map.of("problems",problems);
+        return new CustomResponse(
+               DATA,
+               "Problems fetched successfully.",
+               200,
+                ""
+        );
     }
     
     // READ BY ID
-    public Problem getById(UUID id) {
-        return repository.findById(id)
+    public CustomResponse getById(UUID id) {
+        Problem p =  repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Problem not found"));
+
+        return new CustomResponse(
+               Map.of("problem",p),
+               "Problem fetched successfully.",
+               200,
+                ""
+        );
     }
 
 //    // UPDATE

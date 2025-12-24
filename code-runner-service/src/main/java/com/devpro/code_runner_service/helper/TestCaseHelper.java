@@ -77,12 +77,16 @@ public class TestCaseHelper {
 
                     DATA.put("TotalTestcases", testCases.size());
                     DATA.put("PassedTestcases", passedCount);
+                    DATA.put("LastTestCase", i+1);
+                    DATA.put("ExpectedStatus", testCase.getExpectedStatus());
+                    DATA.put("ActualStatus", actualStatus);
+                    DATA.put("error", "StatusCode mismatch");
 
                     return new CustomResponse(
                             DATA,
                             "Testcase " + (i + 1) + " failed",
-                            500,
-                            "Status code mismatch"
+                            200,
+                            "StatusCode mismatch"
                     );
                 }
 
@@ -96,11 +100,15 @@ public class TestCaseHelper {
 
                         DATA.put("TotalTestcases", testCases.size());
                         DATA.put("PassedTestcases", passedCount);
+                        DATA.put("LastTestCase", i+1);
+                        DATA.put("ExpectedBody", testCase.getExpectedOutputJson().toPrettyString());
+                        DATA.put("ActualBody", actualBody.toPrettyString());
+                        DATA.put("error", "Response body mismatch");
 
                         return new CustomResponse(
                                 DATA,
                                 "Testcase " + (i + 1) + " failed",
-                                500,
+                                200,
                                 "Response body mismatch"
                         );
                     }
@@ -130,11 +138,15 @@ public class TestCaseHelper {
 
                 DATA.put("TotalTestcases", testCases.size());
                 DATA.put("PassedTestcases", passedCount);
+                DATA.put("LastTestCase", i+1);
+                DATA.put("ExpectedStatus", testCase.getExpectedStatus());
+                DATA.put("ActualStatus", actualStatus);
+                DATA.put("error", "Status code mismatch");
 
                 return new CustomResponse(
                         DATA,
                         "Testcase " + (i + 1) + " failed",
-                        500,
+                        200,
                         "Status code mismatch"
                 );
             }
@@ -149,11 +161,15 @@ public class TestCaseHelper {
 
                 DATA.put("TotalTestcases", testCases.size());
                 DATA.put("PassedTestcases", passedCount);
+                DATA.put("LastTestCase", i+1);
+                DATA.put("ExpectedBody", testCase.getExpectedOutputJson().toPrettyString());
+                DATA.put("ActualBody", (actualBody != null ? actualBody.toPrettyString() : "null"));
+                DATA.put("error", "Response body mismatch");
 
                 return new CustomResponse(
                         DATA,
                         "Testcase " + (i + 1) + " failed",
-                        500,
+                        200,
                         "Response body mismatch"
                 );
             }
