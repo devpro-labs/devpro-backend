@@ -1,13 +1,15 @@
 package com.devpro.problem_service.service;
 
-import java.util.UUID;
-
-import org.springframework.stereotype.Service;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.nio.charset.StandardCharsets;
+import java.net.URI;
+import java.util.UUID;
+
 @Service
 public class FileStorageService {
 
@@ -15,6 +17,7 @@ public class FileStorageService {
     private final String supabaseUrl;
     private final String serviceKey;
     private final String bucket;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     public FileStorageService(
             @Value("${supabase.url}") String supabaseUrl,
@@ -30,38 +33,75 @@ public class FileStorageService {
                 .defaultHeader("Authorization", "Bearer " + serviceKey)
                 .defaultHeader("apikey", serviceKey)
                 .build();
-
-        System.out.println(webClient);
     }
 
-    /**
-     * Uploads test case content as a JSON file to Supabase Storage
-     */
-    public String upload(String content, String prefix) {
+    public String upload(String jsonContent, String prefix) {
+
+        // Validate JSON
+        try {
+            objectMapper.readTree(jsonContent);
+        } catch (JsonProcessingException e) {
+            throw new IllegalArgumentException("Invalid JSON", e);
+        }
 
         String fileName = prefix + "-" + UUID.randomUUID() + ".json";
 
-        webClient.put()
+        webClient.post()
                 .uri(uriBuilder -> uriBuilder
                         .path("/storage/v1/object/{bucket}/{file}")
                         .build(bucket, fileName)
                 )
-                .header("Content-Type",  MediaType.APPLICATION_JSON_VALUE)
+                .header("Content-Type", "application/json")
                 .header("x-upsert", "true")
-                .bodyValue(content)
+                .bodyValue(jsonContent)
                 .retrieve()
                 .toBodilessEntity()
                 .block();
 
-        return buildPublicUrl(fileName);
+        // PRIVATE bucket → return internal path, not public URL
+        return bucket + "/" + fileName;
     }
 
+    // ================= DELETE =================
+    public void delete(String filePath) {
+        if (filePath == null) return;
 
-    /**
-     * Generates public URL (works only if bucket is public)
-     */
-    private String buildPublicUrl(String fileName) {
-        return supabaseUrl + "/storage/v1/object/public/"
-                + bucket + "/" + fileName;
+        webClient.delete()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/storage/v1/object/{path}")
+                        .build(filePath))
+                .retrieve()
+                .toBodilessEntity()
+                .block();
+    }
+
+    // ================= SIGNED URL (EXECUTION SERVICE) =================
+    public String generateSignedUrl(String filePath, int expiresInSeconds) {
+
+        return webClient.post()
+                .uri("/storage/v1/object/sign/" + filePath)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""
+                    { "expiresIn": %d }
+                """.formatted(expiresInSeconds))
+                .retrieve()
+                .bodyToMono(String.class)
+                .map(res -> {
+                    try {
+                        return supabaseUrl + "/storage/v1" +
+                                objectMapper.readTree(res).get("signedURL").asText();
+                    } catch (JsonProcessingException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .block();
+    }
+
+    private void validateJson(String json) {
+        try {
+            objectMapper.readTree(json);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid JSON file content", e);
+        }
     }
 }
