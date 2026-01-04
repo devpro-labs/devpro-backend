@@ -3,6 +3,7 @@ package com.devpro.problem_service.dto;
 import java.util.UUID;
 
 import com.devpro.problem_service.model.Method;
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -15,8 +16,8 @@ public class TestCaseRequest {
     private UUID problemId;
 
     // Raw input
-    private String input;
-    private String expectedOutput;
+    private JsonNode input;
+    private JsonNode expectedOutput;
 
     private Integer expectedStatus;
     private Boolean isHidden;

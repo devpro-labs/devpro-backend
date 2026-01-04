@@ -1,0 +1,7 @@
+{
+  "js": [
+    { "image": "express-js-auth", "work": "auth" },
+    { "image": "express-js-db", "work": "db" },
+    { "image": "express-js-core", "work": "api" }
+  ]
+}

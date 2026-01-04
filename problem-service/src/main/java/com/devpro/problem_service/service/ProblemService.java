@@ -19,16 +19,18 @@ public class ProblemService {
     private final TestCaseService testCaseService;
 
     private void map(ProblemRequest request, Problem p) {
-
-        UUID uuid = UUID.randomUUID();
-
         p.setTitle(request.getTitle());
         p.setDescription(request.getDescription());
         p.setDifficulty(request.getDifficulty());
-        p.setCategory(request.getCategory());
+        p.setTags(request.getTags());
         p.setIsActive(true);
-        p.setSlug(uuid.toString());
-
+        p.setServices(request.getServices());
+        p.setCpuLimit(request.getCpuLimit());
+        p.setKeys(request.getKeys());
+        p.setEntryFile(request.getEntryFile());
+        p.setImageName(request.getImageName());
+        p.setMemoryLimitMB(request.getMemoryLimitMB());
+        p.setTimeLimitSeconds(request.getTimeLimitSeconds());
     }
 
     public ProblemService(ProblemRepository repository,  TestCaseService testCaseService) {

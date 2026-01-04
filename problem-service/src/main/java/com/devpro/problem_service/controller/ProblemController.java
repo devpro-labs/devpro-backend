@@ -1,22 +1,17 @@
 package com.devpro.problem_service.controller;
 
-import java.util.List;
 import java.util.UUID;
 
 import com.devpro.problem_service.model.CustomResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.devpro.problem_service.dto.ProblemRequest;
-import com.devpro.problem_service.model.Problem;
 import com.devpro.problem_service.service.ProblemService;
 
 @RestController

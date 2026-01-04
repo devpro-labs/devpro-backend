@@ -8,7 +8,4 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ProblemRepository extends JpaRepository<Problem, UUID> {
-
-    Optional<Problem> findBySlug(String slug);
-}
+public interface ProblemRepository extends JpaRepository<Problem, UUID> { }

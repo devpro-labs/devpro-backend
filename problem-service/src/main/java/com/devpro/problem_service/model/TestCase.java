@@ -31,13 +31,7 @@ public class TestCase {
     @Column(columnDefinition = "jsonb")
     private JsonNode expectedOutputJson;
 
-    private String inputFileUrl;
-    private String expectedOutputFileUrl;
-
-    @Enumerated(EnumType.STRING)
-    private StorageType storageType;
-
-    private Integer sizeKb;
+    private Double sizeKb;
     private Integer expectedStatus;
     private Boolean isHidden;
 
