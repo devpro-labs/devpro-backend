@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,11 +22,11 @@ public class ProblemRequest {
     private String title;
     private String description;
     private String difficulty;
-    private List<String> tags;
+    private List<String> tags = new ArrayList<>();;
 
     private JsonNode imageName;
     private String entryFile;
-    private List<ServiceType> services;
+    private List<ServiceType> services = new ArrayList<>();;
 
     private JsonNode  keys;
 
@@ -33,6 +34,6 @@ public class ProblemRequest {
     private Integer memoryLimitMB;
     private Double cpuLimit;
 
-    private List<TestCaseRequest>  testCases;
+    private List<TestCaseRequest>  testCases = new ArrayList<>();
 
 }

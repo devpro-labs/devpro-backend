@@ -3,13 +3,10 @@ package com.devpro.problem_service.controller;
 import java.util.UUID;
 
 import com.devpro.problem_service.model.CustomResponse;
+import com.devpro.problem_service.model.Problem;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import com.devpro.problem_service.dto.ProblemRequest;
 import com.devpro.problem_service.service.ProblemService;
@@ -44,17 +41,22 @@ public class ProblemController {
     }
 
     // UPDATE
-//    @PutMapping("/{id}")
-//    public ResponseEntity<Problem> update(
-//            @PathVariable UUID id,
-//            @RequestBody ProblemRequest request) {
-//        return ResponseEntity.ok(service.update(id, request));
-//    }
+    // UPDATE
+    @PutMapping("/{id}")
+    public ResponseEntity<CustomResponse> update(
+            @PathVariable UUID id,
+            @RequestBody ProblemRequest request) {
+
+        CustomResponse response = service.update(id, request);
+        return ResponseEntity.ok(response);
+    }
+
 
     // DELETE (soft)
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<Void> delete(@PathVariable UUID id) {
-//        service.delete(id);
-//        return ResponseEntity.noContent().build();
-//    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<CustomResponse> delete(@PathVariable UUID id) {
+
+        CustomResponse response = service.delete(id);
+        return ResponseEntity.ok(response);
+    }
 }

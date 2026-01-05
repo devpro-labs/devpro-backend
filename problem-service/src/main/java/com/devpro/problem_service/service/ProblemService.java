@@ -90,19 +90,40 @@ public class ProblemService {
         );
     }
 
-//    // UPDATE
-//    public Problem update(UUID id, ProblemRequest request) {
-//        Problem p = getById(id);
-//        map(request, p);
-//        return repository.save(p);
-//    }
-//
-//    // DELETE (soft delete)
-//    public void delete(UUID id) {
-//        Problem p = getById(id);
-//        p.setIsActive(false);
-//        repository.save(p);
-//    }
+    private Problem findProblemById(UUID id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Problem not found"));
+    }
+
+    public CustomResponse update(UUID id, ProblemRequest request) {
+        Problem p = findProblemById(id);
+        map(request, p);
+        Problem updated = repository.save(p);
+
+        return new CustomResponse(
+                Map.of("problem", updated),
+                "Problem updated successfully.",
+                200,
+                ""
+        );
+    }
+
+//  Delete
+public CustomResponse delete(UUID id) {
+    if (!repository.existsById(id)) {
+        throw new RuntimeException("Problem not found");
+    }
+
+    repository.deleteById(id);
+
+    return new CustomResponse(
+            Map.of("problemId", id),
+            "Problem deleted permanently",
+            200,
+            ""
+    );
+}
+
 //
 //    private void map(ProblemRequest r, Problem p) {
 //        p.setTitle(r.getTitle());

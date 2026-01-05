@@ -45,3 +45,5 @@ management:
       exposure:
         include: health,info
 
+app:
+  api-key: ${APP_API_KEY}
