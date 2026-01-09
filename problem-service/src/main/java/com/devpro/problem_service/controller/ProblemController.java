@@ -41,7 +41,6 @@ public class ProblemController {
     }
 
     // UPDATE
-    // UPDATE
     @PutMapping("/{id}")
     public ResponseEntity<CustomResponse> update(
             @PathVariable UUID id,

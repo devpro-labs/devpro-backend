@@ -31,11 +31,10 @@ public class Config {
                 .cors(cors -> cors.configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues()))
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers(
-                                "/public/**",
                                 "/webhook/**",
                                 "/healthcheck",
                                 "/actuator/**",
-                                "/api/**"
+                                "/api/problems"
                         ).permitAll()
                         .anyExchange().authenticated()
                 )

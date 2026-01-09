@@ -68,6 +68,7 @@ public class ProblemService {
     // READ ALL
     public CustomResponse getAll() {
         List<Problem> problems =  repository.findAll();
+        System.out.println(problems.size() + " " + problems.getFirst().toString());
         Map<String, Object> DATA = Map.of("problems",problems);
         return new CustomResponse(
                DATA,
