@@ -10,4 +10,7 @@ public class FileNode {
     private boolean isFolder;
     private String content;
     private List<FileNode> children;
+
+    // 🔹 Flag to indicate DB connection detected in this file
+    private boolean dbConnectionDetected = false;
 }

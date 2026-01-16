@@ -7,7 +7,6 @@ import com.devpro.code_runner_service.helper.TestCaseHelper;
 import com.devpro.code_runner_service.service.ICodeRunner;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Map;
 
 @Service
@@ -19,52 +18,71 @@ public class CodeRunnerService implements ICodeRunner {
     public CodeRunnerService(DockerService dockerService, TestCaseHelper helper) {
         this.dockerService = dockerService;
         this.helper = helper;
-
     }
 
     @Override
     public CustomResponse runCode(String uuid, DockerRunner dockerRunner) {
-        //docker container
-        CustomResponse response = dockerService.getPreviewURL(dockerRunner);
 
-        //docker - response
-        Map<String, Object> data = response.getData();
-        var cid  = data.get("containerId").toString();
-        var fileId = data.get("fileId").toString();
-        var fileName = data.get("fileName").toString();
-        var url = (PreviewURL)data.get("url");
+        String cid = null;
+        String fileId = null;
+        String fileName = null;
 
+        try {
+            // 1️⃣ Start container
+            CustomResponse response = dockerService.getPreviewURL(dockerRunner);
 
-        //run code - sample testcases
-        response = helper.codeRun(uuid, url);
+            if (response == null || response.getData() == null) {
+                return new CustomResponse(null, "Docker failed to start", 500, null);
+            }
 
-        //delete code
-        dockerService.deleteContainer(cid, fileId, fileName);
+            Map<String, Object> data = response.getData();
 
-        return response;
+            cid = data.get("containerId").toString();
+            fileId = data.get("fileId").toString();
+            fileName = data.get("fileName").toString();
+            PreviewURL url = (PreviewURL) data.get("url");
 
+            // 2️⃣ Run sample testcases
+            return helper.codeRun(uuid, url);
+
+        } finally {
+            // 3️⃣ ALWAYS cleanup
+            if (cid != null && fileId != null) {
+                dockerService.deleteContainer(cid, fileId, fileName);
+            }
+        }
     }
 
     @Override
     public CustomResponse submitCode(String uuid, DockerRunner dockerRunner) {
-//        //docker container
-        CustomResponse response = dockerService.getPreviewURL(dockerRunner);
 
-        //docker - response
-        Map<String, Object> data = response.getData();
-        var cid  = data.get("containerId").toString();
-        var fileId = data.get("fileId").toString();
-        var fileName = data.get("fileName").toString();
-        var url = (PreviewURL)data.get("url");
+        String cid = null;
+        String fileId = null;
+        String fileName = null;
 
+        try {
+            // 1️⃣ Start container
+            CustomResponse response = dockerService.getPreviewURL(dockerRunner);
 
-        //run code - sample and hidden testcases
-        response = helper.codeSubmit(uuid, url);
+            if (response == null || response.getData() == null) {
+                return new CustomResponse(null, "Docker failed to start", 500, null);
+            }
 
-        //delete code
-        dockerService.deleteContainer(cid, fileId, fileName);
+            Map<String, Object> data = response.getData();
 
-        return response;
+            cid = data.get("containerId").toString();
+            fileId = data.get("fileId").toString();
+            fileName = data.get("fileName").toString();
+            PreviewURL url = (PreviewURL) data.get("url");
+
+            // 2️⃣ Run sample + hidden testcases
+            return helper.codeSubmit(uuid, url);
+
+        } finally {
+            // 3️⃣ ALWAYS cleanup
+            if (cid != null && fileId != null) {
+                dockerService.deleteContainer(cid, fileId, fileName);
+            }
+        }
     }
-
 }

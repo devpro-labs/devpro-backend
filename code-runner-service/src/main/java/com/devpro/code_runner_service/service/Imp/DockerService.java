@@ -19,6 +19,7 @@ import java.net.URL;
 import java.nio.file.*;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
 public class DockerService implements IDockerRepo {
@@ -142,11 +143,34 @@ public class DockerService implements IDockerRepo {
         try {
             System.out.println("========== PREVIEW REQUEST ==========");
             System.out.println("Image       : " + runner.getImage_name());
-            System.out.println("Framework   : " + runner.getLibOrFramework());
             System.out.println("Main file   : " + runner.getFile_name());
             System.out.println("Files tree  :");
 
+            // ----------------- Determine framework and language -----------------
+            String framework;
+            String language;
+            // ----------------- Map legacy/invalid images to allowed images -----------------
+            switch (runner.getImage_name()) {
+                case "express-js-core" -> runner.setImage_name("runner-javascript-express");
+                case "ts-express-core" -> runner.setImage_name("runner-typescript-express");
+                case "fastapi-core" -> runner.setImage_name("runner-python-fastapi");
+                // else keep it as is (assume already valid)
+            }
+
+            switch (runner.getImage_name()) {
+                case "runner-typescript-express" -> { framework = "express"; language = "typescript"; }
+                case "runner-javascript-express" -> { framework = "express"; language = "javascript"; }
+                case "runner-python-fastapi" -> { framework = "fastapi"; language = "python"; }
+                default -> throw new RuntimeException("Unsupported image: " + runner.getImage_name());
+            }
+
+            // ----------------- Preprocess files: ignore DB connections -----------------
+            boolean dbDetected = preprocessFiles(runner.getFiles());
+            runner.setDbConnectionDetected(dbDetected);
+
             logFileTree(runner.getFiles(), "  ");
+            System.out.println("DB connection detected: " + dbDetected);
+            System.out.println("Framework: " + framework + ", Language: " + language);
             System.out.println("=====================================");
 
             String previewId = UUID.randomUUID().toString();
@@ -155,53 +179,60 @@ public class DockerService implements IDockerRepo {
 
             File projectDir = new File(projectRoot);
             projectDir.mkdirs();
-
             Path projectRootPath = projectDir.toPath();
 
-            // Write all files & folders
-            writeFileTree(runner.getFiles(), projectRootPath);
-            // 🔹 Express setup
-            if (runner.getLibOrFramework().equals("express")) {
+            // ----------------- Fetch files from Supabase if DB connection detected -----------------
+            if (dbDetected) {
+                System.out.println("Fetching input files from Supabase due to DB connection...");
+                fetchFilesFromSupabase(projectRootPath, runner.getFiles());
+            } else {
+                writeFileTree(runner.getFiles(), projectRootPath);
+            }
+
+            // ----------------- Framework-specific setup -----------------
+            if ("express".equals(framework) && "typescript".equals(language)) {
+                writePackageJson(projectDir, true);
+                writeTsConfig(projectDir);
+            } else if ("express".equals(framework)) {
                 writePackageJson(projectDir, false);
             }
 
-            // 🔹 TypeScript Express setup
-            if (runner.getLibOrFramework().equals("ts-express")) {
-                writePackageJson(projectDir, true);
-                writeTsConfig(projectDir);
-            }
-
-            // 🔹 Bind project directory with limit
+            // ----------------- Docker host config -----------------
             HostConfig hostConfig = HostConfig.newHostConfig()
                     .withBinds(new Bind(projectRoot, new Volume("/app")))
-                    .withMemory(256L * 1024 * 1024)          // 256 MB RAM
-                    .withMemorySwap(256L * 1024 * 1024)     // no swap
+                    .withMemory(256L * 1024 * 1024)
+                    .withMemorySwap(256L * 1024 * 1024)
                     .withCpuPeriod(100_000L)
-                    .withCpuQuota(50_000L)                  // 0.5 CPU
-                    .withPidsLimit(64L);                    // fork bomb protection
+                    .withCpuQuota(50_000L)
+                    .withPidsLimit(64L);
 
-            System.out.println("host config is ready " + Arrays.toString(hostConfig.getBinds()));
-
-            // 🔹 Pull image if needed
+            // ----------------- Pull/check image -----------------
             try {
                 dockerClient.inspectImageCmd(runner.getImage_name()).exec();
-            } catch (Exception e) {
-                dockerClient.pullImageCmd(runner.getImage_name())
-                        .start().awaitCompletion();
+                System.out.println("Image found locally: " + runner.getImage_name());
+            } catch (com.github.dockerjava.api.exception.NotFoundException e) {
+                System.out.println("Image not found locally, trying to pull: " + runner.getImage_name());
+                try {
+                    dockerClient.pullImageCmd(runner.getImage_name())
+                            .start()
+                            .awaitCompletion();
+                    System.out.println("Image pulled successfully: " + runner.getImage_name());
+                } catch (Exception pullEx) {
+                    return new CustomResponse(
+                            null,
+                            "Docker image not found or access denied: " + runner.getImage_name(),
+                            404,
+                            null
+                    );
+                }
             }
 
-            ExposedPort exposedPort = switch (runner.getLibOrFramework()) {
-                case "express", "ts-express" -> ExposedPort.tcp(3000);
-                case "fastapi" -> ExposedPort.tcp(8000);
-                default -> throw new RuntimeException("Unsupported framework");
-            };
+            // ----------------- Exposed port -----------------
+            ExposedPort exposedPort = "express".equals(framework) ? ExposedPort.tcp(3000) : ExposedPort.tcp(8000);
 
+            // ----------------- Create container -----------------
             CreateContainerResponse container = dockerClient.createContainerCmd(runner.getImage_name())
-                    .withHostConfig(
-                            hostConfig.withPortBindings(
-                                    new PortBinding(Ports.Binding.empty(), exposedPort)
-                            )
-                    )
+                    .withHostConfig(hostConfig.withPortBindings(new PortBinding(Ports.Binding.empty(), exposedPort)))
                     .withExposedPorts(exposedPort)
                     .exec();
 
@@ -209,31 +240,24 @@ public class DockerService implements IDockerRepo {
             dockerClient.startContainerCmd(containerId).exec();
             streamContainerLogs(containerId);
 
-            // 🔹 Kill default process
-            exec(containerId,
-                    "pkill -9 node || true; pkill -9 python || true");
+            // Kill default processes
+            exec(containerId, "pkill -9 node || true; pkill -9 python || true");
 
-            // 🔹 Run user app
-            String cmd = switch (runner.getLibOrFramework()) {
-                case "express" -> "ln -sf /runtime/node_modules /app/node_modules && sleep 1 && node /app/" + runner.getFile_name();
-                case "ts-express" -> "tsx /app/" + runner.getFile_name();
-                case "fastapi" -> "uvicorn " + runner.getFile_name().replace(".py", "")
-                        + ":app --host 0.0.0.0 --port 8000";
-                default -> "";
-            };
-
+            // ----------------- Run user app -----------------
+            String cmd;
+            if ("express".equals(framework)) {
+                cmd = "ln -sf /runtime/node_modules /app/node_modules && sleep 1 && node /app/" + runner.getFile_name();
+            } else { // fastapi
+                cmd = "uvicorn " + runner.getFile_name().replace(".py", "") + ":app --host 0.0.0.0 --port 8000";
+            }
             exec(containerId, cmd + " &");
 
-            // 🔹 Get host port
-            InspectContainerResponse inspect =
-                    dockerClient.inspectContainerCmd(containerId).exec();
-
-            Ports.Binding[] bindings =
-                    inspect.getNetworkSettings().getPorts().getBindings().get(exposedPort);
-
+            // ----------------- Get host port -----------------
+            InspectContainerResponse inspect = dockerClient.inspectContainerCmd(containerId).exec();
+            Ports.Binding[] bindings = inspect.getNetworkSettings().getPorts().getBindings().get(exposedPort);
             int hostPort = Integer.parseInt(bindings[0].getHostPortSpec());
 
-            // 🔹 Health check
+            // ----------------- Health check -----------------
             waitForServer(hostPort);
 
             PreviewURL url = new PreviewURL(
@@ -248,17 +272,51 @@ public class DockerService implements IDockerRepo {
             data.put("fileName", runner.getFile_name());
             data.put("url", url);
 
-            return new CustomResponse(
-                    data,
-                    "Container started successfully",
-                    200,
-                    "200"
-            );
+            return new CustomResponse(data, "Container started successfully", 200, "200");
 
         } catch (Exception e) {
             System.out.println(e);
             return new CustomResponse(null, e.getMessage(), 500, null);
         }
+    }
+
+    // 🔹 Preprocess files: remove DB connections
+    private boolean preprocessFiles(List<FileNode> files) {
+        if (files == null) return false;
+
+        // Use AtomicBoolean to allow mutation inside recursion/lambda
+        AtomicBoolean dbDetected = new AtomicBoolean(false);
+
+        for (FileNode f : files) {
+            if (f.getContent() != null) {
+                String original = f.getContent();
+                String cleaned = original.replaceAll(
+                        "(?i).*\\b(mongoose\\.connect|mysql\\.createConnection|pg\\.connect)\\b.*",
+                        "// DB connection ignored"
+                );
+                if (!original.equals(cleaned)) dbDetected.set(true);
+                f.setContent(cleaned);
+            }
+            // Recursive call for children
+            if (f.getChildren() != null) {
+                if (preprocessFiles(f.getChildren())) {
+                    dbDetected.set(true);
+                }
+            }
+        }
+
+        // Set the flag in each FileNode
+        files.forEach(f -> f.setDbConnectionDetected(dbDetected.get()));
+
+        return dbDetected.get();
+    }
+
+    // 🔹 Fetch files from Supabase (pseudo code)
+    private void fetchFilesFromSupabase(Path projectRoot, List<FileNode> files) throws Exception {
+        // Implement your Supabase S3 fetch logic here
+        // For example, using supabase-java client:
+        // SupabaseClient storageClient = ...
+        // for each file, download to projectRoot
     }
 
     private void exec(String containerId, String cmd) throws Exception {
@@ -327,23 +385,45 @@ public class DockerService implements IDockerRepo {
     @Override
     public CustomResponse deleteContainer(String containerId, String fileId, String fileName) {
         try {
-            dockerClient.removeContainerCmd(containerId)
-                    .withForce(true).exec();
+            // ----------------- Stop the container first (if running) -----------------
+            try {
+                dockerClient.stopContainerCmd(containerId)
+                        .withTimeout(5) // seconds
+                        .exec();
+            } catch (com.github.dockerjava.api.exception.NotFoundException ignored) {
+                // Container already removed
+            } catch (Exception e) {
+                System.err.println("Error stopping container: " + e.getMessage());
+            }
 
+            // ----------------- Remove container -----------------
+            try {
+                dockerClient.removeContainerCmd(containerId)
+                        .withForce(true)
+                        .exec();
+            } catch (com.github.dockerjava.api.exception.NotFoundException ignored) {
+                // Already deleted
+            } catch (Exception e) {
+                return new CustomResponse(null, "Failed to remove container: " + e.getMessage(), 500, null);
+            }
+
+            // ----------------- Delete workdir files -----------------
             Path workdir = Paths.get(
                     new File(".").getCanonicalPath(),
                     "workdir",
                     "preview-" + fileId
             );
 
-            Files.walk(workdir)
-                    .sorted(Comparator.reverseOrder())
-                    .forEach(p -> {
-                        try {
-                            Files.delete(p);
-                        } catch (Exception ignored) {
-                        }
-                    });
+            if (Files.exists(workdir)) {
+                Files.walk(workdir)
+                        .sorted(Comparator.reverseOrder())
+                        .forEach(p -> {
+                            try {
+                                Files.delete(p);
+                            } catch (Exception ignored) {
+                            }
+                        });
+            }
 
             return new CustomResponse(
                     Map.of("message", "Deleted successfully"),
