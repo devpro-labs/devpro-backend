@@ -1,5 +1,0 @@
-spring:
-  application:
-    name: submission-service
-server:
-  port: 8084
