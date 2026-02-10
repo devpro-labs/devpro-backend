@@ -52,10 +52,6 @@ public class CodeRunnerService implements ICodeRunner {
 
     }
 
-
-
-
-
     @Override
     public CustomResponse submitCode(String uuid, DockerRunner dockerRunner) {
 
