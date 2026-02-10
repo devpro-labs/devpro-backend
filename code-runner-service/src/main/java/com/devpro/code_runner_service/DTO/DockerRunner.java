@@ -1,7 +1,6 @@
 package com.devpro.code_runner_service.DTO;
 
 import lombok.*;
-
 import java.util.List;
 
 @Getter
@@ -9,7 +8,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-@Data
 public class DockerRunner {
     private String image_name;
     private String libOrFramework;
@@ -18,4 +16,7 @@ public class DockerRunner {
 
     // 🔹 Flag to indicate DB connection detected in any file
     private boolean dbConnectionDetected = false;
+
+    // 🔹 URL for Docker Compose file (needed for container execution)
+    private String dockerComposeUrl;
 }

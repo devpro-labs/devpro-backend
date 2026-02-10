@@ -2,6 +2,7 @@ package com.devpro.problem_service.model;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -36,11 +37,6 @@ public class Problem {
     private List<String> tags;
 
 
-    /*  runtime  */
-    @Column(nullable = false, columnDefinition = "jsonb")
-    @Type(JsonBinaryType.class)
-    private JsonNode imageName;
-
     @Column(nullable = false)
     private String entryFile;
 
@@ -48,13 +44,17 @@ public class Problem {
     @Column(columnDefinition = "jsonb")
     private List<ServiceType> services;
 
+    /* docker compose template for this problem */
+    @Type(JsonBinaryType.class)
+    @Column(name = "compose_file", columnDefinition = "jsonb")
+    private Map<String, String> composeFile;
 
     /* env */
     @Type(JsonBinaryType.class)
     @Column(columnDefinition = "jsonb", name = "problem_keys")
     private JsonNode keys;
 
-    /** limits **/
+    /* limits */
     @Column
     private Integer timeLimitSeconds;
 
@@ -69,5 +69,4 @@ public class Problem {
 
     @Column
     private Instant createdAt = Instant.now();
-
 }

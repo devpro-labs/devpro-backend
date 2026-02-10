@@ -28,7 +28,6 @@ public class ProblemService {
         p.setCpuLimit(request.getCpuLimit());
         p.setKeys(request.getKeys());
         p.setEntryFile(request.getEntryFile());
-        p.setImageName(request.getImageName());
         p.setMemoryLimitMB(request.getMemoryLimitMB());
         p.setTimeLimitSeconds(request.getTimeLimitSeconds());
     }
