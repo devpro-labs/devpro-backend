@@ -2,6 +2,7 @@ package com.devpro.code_runner_service.helper;
 
 import com.devpro.code_runner_service.DTO.CustomResponse;
 import com.devpro.code_runner_service.DTO.PreviewURL;
+import com.devpro.code_runner_service.models.Problem;
 import com.devpro.code_runner_service.models.TestCase;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,39 +29,47 @@ public class TestCaseHelper {
         return testCaseClient.getTestCases(uuid);
     }
 
+    public String getPublicUrl(String publicId){
+        return testCaseClient.getPublicUrl(publicId);
+    }
+
+    public Problem getProblemById(String uuid){
+        return testCaseClient.getProblem(uuid);
+    }
+
     private List<TestCase> getSampleTestCases(String uuid) {
         return testCaseClient.getTestCases(uuid).stream().filter((tc) -> tc.getIsHidden() == false).toList();
     }
 
-    private CustomResponse TestCaseChecker(List<TestCase> testCases, PreviewURL url) {
+    private CustomResponse TestCaseChecker(
+            List<TestCase> testCases,
+            PreviewURL url,
+            Boolean isSample
+    ) {
 
         int passedCount = 0;
+        List<Map<String, Object>> testCaseReports = new ArrayList<>();
         Map<String, Object> DATA = new HashMap<>();
-
-        System.out.println("======================================");
-        System.out.println(" Starting Test Case Execution ");
-        System.out.println(" Total Testcases: " + testCases.size());
-        System.out.println(" Base URL: " + url.getUrl());
-        System.out.println("======================================");
 
         for (int i = 0; i < testCases.size(); i++) {
 
             TestCase testCase = testCases.get(i);
+            Map<String, Object> report = new HashMap<>();
 
-            System.out.println("\n--------------------------------------");
-            System.out.println(" Running Testcase #" + (i + 1));
-            System.out.println(" Method   : " + testCase.getMethod());
-            System.out.println(" Endpoint : " + testCase.getEndpoint());
-            System.out.println(" Input    : " + testCase.getInputJson());
-            System.out.println(" Expected Status : " + testCase.getExpectedStatus());
-            System.out.println("--------------------------------------");
+            report.put("testCaseNo", i + 1);
+            report.put("method", testCase.getMethod());
+            report.put("endpoint", testCase.getEndpoint());
+            report.put("input", testCase.getInputJson());
+            report.put("expectedStatus", testCase.getExpectedStatus());
+            report.put("expectedBody", testCase.getExpectedOutputJson());
 
-            HttpMethod httpMethod = HttpMethod.valueOf(testCase.getMethod().toString());
-
-            ResponseEntity<JsonNode> responseEntity;
+            boolean isPassed = false;
 
             try {
-                responseEntity = webClient
+
+                HttpMethod httpMethod = HttpMethod.valueOf(testCase.getMethod().toString());
+
+                ResponseEntity<JsonNode> responseEntity = webClient
                         .method(httpMethod)
                         .uri(url.getUrl() + testCase.getEndpoint())
                         .accept(MediaType.APPLICATION_JSON)
@@ -68,130 +77,107 @@ public class TestCaseHelper {
                         .retrieve()
                         .toEntity(JsonNode.class)
                         .block();
+
+                int actualStatus = responseEntity.getStatusCodeValue();
+                JsonNode actualBody = responseEntity.getBody();
+
+                report.put("actualStatus", actualStatus);
+                report.put("actualBody", actualBody);
+
+                if (actualStatus == testCase.getExpectedStatus()
+                        && Objects.equals(actualBody, testCase.getExpectedOutputJson())) {
+
+                    report.put("status", "PASSED");
+                    isPassed = true;
+                    passedCount++;
+
+                } else {
+
+                    report.put("status", "FAILED");
+                    report.put("error",
+                            actualStatus != testCase.getExpectedStatus()
+                                    ? "Status code mismatch"
+                                    : "Response body mismatch"
+                    );
+                }
+
             } catch (WebClientResponseException ex) {
 
                 int actualStatus = ex.getStatusCode().value();
-
-                if (actualStatus != testCase.getExpectedStatus()) {
-                    System.out.println("❌ Status Mismatch");
-
-                    DATA.put("TotalTestcases", testCases.size());
-                    DATA.put("PassedTestcases", passedCount);
-                    DATA.put("LastTestCase", i+1);
-                    DATA.put("ExpectedStatus", testCase.getExpectedStatus());
-                    DATA.put("ActualStatus", actualStatus);
-                    DATA.put("error", "StatusCode mismatch");
-
-                    return new CustomResponse(
-                            DATA,
-                            "Testcase " + (i + 1) + " failed",
-                            200,
-                            "StatusCode mismatch"
-                    );
-                }
+                report.put("actualStatus", actualStatus);
 
                 try {
-                    JsonNode actualBody = new ObjectMapper().readTree(ex.getResponseBodyAsString());
-                    System.out.println("Actual Body: " + actualBody.toPrettyString());
-                    System.out.println("Expected Body: " + testCase.getExpectedOutputJson().toPrettyString());
-                    if (!actualBody.equals(testCase.getExpectedOutputJson())) {
-
-                        System.out.println("❌ Response Body Mismatch");
-
-                        DATA.put("TotalTestcases", testCases.size());
-                        DATA.put("PassedTestcases", passedCount);
-                        DATA.put("LastTestCase", i+1);
-                        DATA.put("ExpectedBody", testCase.getExpectedOutputJson().toPrettyString());
-                        DATA.put("ActualBody", actualBody.toPrettyString());
-                        DATA.put("error", "Response body mismatch");
-
-                        return new CustomResponse(
-                                DATA,
-                                "Testcase " + (i + 1) + " failed",
-                                200,
-                                "Response body mismatch"
-                        );
-                    }
-
-                } catch (Exception parseEx) {
-                    return new CustomResponse(
-                            null,
-                            "Invalid response body",
-                            500,
-                            parseEx.getMessage()
-                    );
+                    JsonNode actualBody = new ObjectMapper()
+                            .readTree(ex.getResponseBodyAsString());
+                    report.put("actualBody", actualBody);
+                } catch (Exception e) {
+                    report.put("actualBody", ex.getResponseBodyAsString());
                 }
 
-                System.out.println("✅ Testcase Passed");
-                passedCount++;
-                continue;
+                if (actualStatus == testCase.getExpectedStatus()) {
+
+                    try {
+                        JsonNode actualBody = new ObjectMapper()
+                                .readTree(ex.getResponseBodyAsString());
+
+                        if (actualBody.equals(testCase.getExpectedOutputJson())) {
+                            report.put("status", "PASSED");
+                            isPassed = true;
+                            passedCount++;
+                        } else {
+                            report.put("status", "FAILED");
+                            report.put("error", "Response body mismatch");
+                        }
+
+                    } catch (Exception e) {
+                        report.put("status", "FAILED");
+                        report.put("error", "Invalid response body");
+                    }
+
+                } else {
+                    report.put("status", "FAILED");
+                    report.put("error", "Status code mismatch");
+                }
+
+            } catch (Exception ex) {
+
+                report.put("status", "FAILED");
+                report.put("error", ex.getMessage());
             }
 
-            int actualStatus = responseEntity.getStatusCodeValue();
-            JsonNode actualBody = responseEntity.getBody();
+            // -----------------------------
+            // LEETCODE STYLE EXIT
+            // -----------------------------
+            if (!isSample && !"PASSED".equals(report.get("status"))) {
 
-            if (actualStatus != testCase.getExpectedStatus()) {
-
-                System.out.println("❌ Status Mismatch");
-                System.out.println(" Expected : " + testCase.getExpectedStatus());
-                System.out.println(" Actual   : " + actualStatus);
-
-                DATA.put("TotalTestcases", testCases.size());
                 DATA.put("PassedTestcases", passedCount);
-                DATA.put("LastTestCase", i+1);
-                DATA.put("ExpectedStatus", testCase.getExpectedStatus());
-                DATA.put("ActualStatus", actualStatus);
-                DATA.put("error", "Status code mismatch");
+                DATA.put("FailedAt", i + 1);
+                DATA.put("Result", report);
 
                 return new CustomResponse(
                         DATA,
-                        "Testcase " + (i + 1) + " failed",
+                        "Wrong Answer",
                         200,
-                        "Status code mismatch"
+                        "Testcase " + (i + 1) + " failed"
                 );
             }
 
-            if (!Objects.equals(actualBody, testCase.getExpectedOutputJson())) {
-
-                System.out.println("❌ Response Body Mismatch");
-                System.out.println(" Expected Body : "
-                        + testCase.getExpectedOutputJson().toPrettyString());
-                System.out.println(" Actual Body   : "
-                        + (actualBody != null ? actualBody.toPrettyString() : "null"));
-
-                DATA.put("TotalTestcases", testCases.size());
-                DATA.put("PassedTestcases", passedCount);
-                DATA.put("LastTestCase", i+1);
-                DATA.put("ExpectedBody", testCase.getExpectedOutputJson().toPrettyString());
-                DATA.put("ActualBody", (actualBody != null ? actualBody.toPrettyString() : "null"));
-                DATA.put("error", "Response body mismatch");
-
-                return new CustomResponse(
-                        DATA,
-                        "Testcase " + (i + 1) + " failed",
-                        200,
-                        "Response body mismatch"
-                );
-            }
-
-            System.out.println("✅ Testcase Passed");
-            passedCount++;
+            testCaseReports.add(report);
         }
 
-        System.out.println("\n======================================");
-        System.out.println(" ✅ ALL TEST CASES PASSED ");
-        System.out.println(" Passed: " + passedCount + "/" + testCases.size());
-        System.out.println("======================================");
-
+        // -----------------------------
+        // SAMPLE MODE FULL REPORT
+        // -----------------------------
         DATA.put("TotalTestcases", testCases.size());
         DATA.put("PassedTestcases", passedCount);
-        DATA.put("message", "All test cases passed");
+        DATA.put("FailedTestcases", testCases.size() - passedCount);
+        DATA.put("Reports", testCaseReports);
 
         return new CustomResponse(
                 DATA,
-                "All test cases passed",
+                "All testcases executed",
                 200,
-                "All test cases passed"
+                "Execution finished"
         );
     }
 
@@ -203,7 +189,7 @@ public class TestCaseHelper {
         List<TestCase> testCases = getSampleTestCases(uuid);
 
         //check one by one
-        return TestCaseChecker(testCases, url);
+        return TestCaseChecker(testCases, url, true);
     }
 
     public CustomResponse codeSubmit(String uuid, PreviewURL url) {
@@ -211,6 +197,6 @@ public class TestCaseHelper {
         List<TestCase> testCases = getTestCase(uuid);
 
         //check one by one
-        return TestCaseChecker(testCases, url);
+        return TestCaseChecker(testCases, url, false);
     }
 }

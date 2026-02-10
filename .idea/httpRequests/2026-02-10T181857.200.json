@@ -1,0 +1,38 @@
+{
+  "DATA": {
+    "problem": {
+      "id": "7d50f4aa-3923-4bc8-b1cb-309905a8d45d",
+      "title": "JWT Authentication REST API",
+      "description": "Build a REST API with JWT-based authentication. Users should be able to register, login, and access protected routes using a valid token.",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "auth",
+        "jwt",
+        "rest-api",
+        "backend"
+      ],
+      "entryFile": "index",
+      "services": [
+        "AUTH",
+        "REST"
+      ],
+      "composeFile": {
+        "py-fastapi": "devpro-dev/b0tbdv8eniaajvlrahaq",
+        "ts-express": "devpro-dev/af4jetccovrsyrsmbnow",
+        "js-express": "devpro-dev/yotwflnhb6xaxfsztqkc"
+      },
+      "keys": {
+        "JWT_SECRET": "secret123",
+        "PORT": 3000
+      },
+      "timeLimitSeconds": 5,
+      "memoryLimitMB": 512,
+      "cpuLimit": 1.0,
+      "isActive": true,
+      "createdAt": "2026-02-10T12:48:51.594973500Z"
+    }
+  },
+  "MESSAGE": "Successfully created problem",
+  "STATUS": 201,
+  "ERROR": ""
+}

@@ -1,5 +1,6 @@
 package com.devpro.user_service.controllers;
 
+import com.devpro.user_service.model.Response;
 import com.devpro.user_service.model.User;
 import com.devpro.user_service.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,7 +26,7 @@ public class Webhook {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<User> createuser(HttpServletRequest request) {
+    public Response createUser(HttpServletRequest request) {
         return userService.CreateUser(request);
     }
 }

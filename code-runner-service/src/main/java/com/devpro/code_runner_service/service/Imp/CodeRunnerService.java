@@ -4,9 +4,12 @@ import com.devpro.code_runner_service.DTO.CustomResponse;
 import com.devpro.code_runner_service.DTO.DockerRunner;
 import com.devpro.code_runner_service.DTO.PreviewURL;
 import com.devpro.code_runner_service.helper.TestCaseHelper;
+import com.devpro.code_runner_service.models.Problem;
 import com.devpro.code_runner_service.service.ICodeRunner;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -24,8 +27,12 @@ public class CodeRunnerService implements ICodeRunner {
 
     @Override
     public CustomResponse runCode(String uuid, DockerRunner dockerRunner) {
+
+        //get problem
+        Problem problem = helper.getProblemById(uuid);
+
         //docker container
-        CustomResponse response = dockerService.getPreviewURL(dockerRunner);
+        CustomResponse response = dockerService.getPreviewURL(dockerRunner, problem);
 
         //docker - response
         Map<String, Object> data = response.getData();
@@ -39,16 +46,22 @@ public class CodeRunnerService implements ICodeRunner {
         response = helper.codeRun(uuid, url);
 
         //delete code
-        dockerService.deleteContainer(cid, fileId, fileName);
+//        dockerService.deleteContainer(cid, fileId, fileName);
 
         return response;
 
     }
 
+
+
+
+
     @Override
     public CustomResponse submitCode(String uuid, DockerRunner dockerRunner) {
+
+        Problem problem = helper.getProblemById(uuid);
 //        //docker container
-        CustomResponse response = dockerService.getPreviewURL(dockerRunner);
+        CustomResponse response = dockerService.getPreviewURL(dockerRunner, problem);
 
         //docker - response
         Map<String, Object> data = response.getData();

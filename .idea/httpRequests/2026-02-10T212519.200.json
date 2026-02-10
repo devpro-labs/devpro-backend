@@ -1,0 +1,35 @@
+{
+  "DATA": {
+    "problem": {
+      "id": "00983d8f-024d-43a2-94a8-3838bd254e2f",
+      "title": "User Management REST API (CRUD)",
+      "description": "Build a REST API to manage users using CRUD operations. The API should allow creating, retrieving, updating, and deleting users. Each user should have an id, name, email, and age. Data can be stored in memory or a simple database.",
+      "difficulty": "EASY",
+      "tags": [
+        "rest-api",
+        "crud",
+        "backend"
+      ],
+      "entryFile": "index",
+      "services": [
+        "REST"
+      ],
+      "composeFile": {
+        "py-fastapi": "devpro-dev/sjalpvpmzfgfreuvetwq",
+        "ts-express": "devpro-dev/gihvlxdzkxqomfnuzyj3",
+        "js-express": "devpro-dev/pkbjbkfumdbut68aqajc"
+      },
+      "keys": {
+        "PORT": 3000
+      },
+      "timeLimitSeconds": 5,
+      "memoryLimitMB": 512,
+      "cpuLimit": 1.0,
+      "isActive": true,
+      "createdAt": "2026-02-10T15:55:09.503032900Z"
+    }
+  },
+  "MESSAGE": "Successfully created problem",
+  "STATUS": 201,
+  "ERROR": ""
+}

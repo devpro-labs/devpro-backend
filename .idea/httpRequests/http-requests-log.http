@@ -1,0 +1,401 @@
+POST http://localhost:9000/api/problems
+X-API-KEY: devpro1580
+Accept: application/json
+Content-Type: multipart/form-data; boundary=----DevProBoundary
+User-Agent: IntelliJ HTTP Client/IntelliJ IDEA 2025.1.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+content-length: 3756
+
+------DevProBoundary
+Content-Disposition: form-data; name="problem"
+Content-Type: application/json
+
+{
+  "title": "User Management REST API (CRUD)",
+  "description": "Build a REST API to manage users using CRUD operations. The API should allow creating, retrieving, updating, and deleting users. Each user should have an id, name, email, and age. Data can be stored in memory or a simple database.",
+  "difficulty": "EASY",
+  "tags": ["rest-api", "crud", "backend"],
+  "entryFile": "index",
+  "services": ["REST"],
+  "keys": {
+    "PORT": 3000
+  },
+  "timeLimitSeconds": 5,
+  "memoryLimitMB": 512,
+  "cpuLimit": 1.0,
+
+  "testCases": [
+    {
+      "input": {
+        "name": "Alice",
+        "email": "alice@example.com",
+        "age": 22
+      },
+      "expectedOutput": {
+        "message": "User created successfully",
+        "name": "Alice",
+        "email": "alice@example.com",
+        "age": 22
+      },
+      "expectedStatus": 201,
+      "isHidden": false,
+      "method": "POST",
+      "endpoint": "/users"
+    },
+    {
+      "input": {},
+      "expectedOutput": {
+        "email": "alice@example.com"
+      },
+      "expectedStatus": 200,
+      "isHidden": false,
+      "method": "GET",
+      "endpoint": "/users/1"
+    },
+    {
+      "input": {
+        "age": 23
+      },
+      "expectedOutput": {
+        "message": "User updated successfully",
+        "age": 23
+      },
+      "expectedStatus": 200,
+      "isHidden": false,
+      "method": "PUT",
+      "endpoint": "/users/1"
+    },
+
+    {
+      "input": {},
+      "expectedOutput": {
+        "error": "User not found"
+      },
+      "expectedStatus": 404,
+      "isHidden": true,
+      "method": "GET",
+      "endpoint": "/users/999"
+    },
+    {
+      "input": {},
+      "expectedOutput": {
+        "message": "User deleted successfully"
+      },
+      "expectedStatus": 200,
+      "isHidden": true,
+      "method": "DELETE",
+      "endpoint": "/users/1"
+    },
+    {
+      "input": {},
+      "expectedOutput": {
+        "error": "User not found"
+      },
+      "expectedStatus": 404,
+      "isHidden": true,
+      "method": "DELETE",
+      "endpoint": "/users/1"
+    },
+    {
+      "input": {
+        "email": "invalid-email"
+      },
+      "expectedOutput": {
+        "error": "Invalid email format"
+      },
+      "expectedStatus": 400,
+      "isHidden": true,
+      "method": "POST",
+      "endpoint": "/users"
+    },
+    {
+      "input": {},
+      "expectedOutput": {
+        "error": "No users found"
+      },
+      "expectedStatus": 200,
+      "isHidden": true,
+      "method": "GET",
+      "endpoint": "/users"
+    }
+  ]
+}
+------DevProBoundary
+Content-Disposition: form-data; name="composeFiles"; filename="express-js-compose.yml"
+Content-Type: application/x-yaml
+
+< D:\DevPro-lab\devpro-backend\problem-compose-dataset\2\express-js-compose.yml
+------DevProBoundary
+Content-Disposition: form-data; name="composeFiles"; filename="express-js-compose.yml"
+Content-Type: application/x-yaml
+
+< D:\DevPro-lab\devpro-backend\problem-compose-dataset\2\express-js-compose.yml
+------DevProBoundary
+Content-Disposition: form-data; name="composeFiles"; filename="express-js-compose.yml"
+Content-Type: application/x-yaml
+
+< D:\DevPro-lab\devpro-backend\problem-compose-dataset\2\express-js-compose.yml
+------DevProBoundary--
+
+<> 2026-02-10T212519.200.json
+
+###
+
+POST http://localhost:9000/api/problems
+X-API-KEY: devpro1580
+Accept: application/json
+Content-Type: multipart/form-data; boundary=----DevProBoundary
+User-Agent: IntelliJ HTTP Client/IntelliJ IDEA 2025.1.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+content-length: 2774
+
+------DevProBoundary
+Content-Disposition: form-data; name="problem"
+Content-Type: application/json
+
+{
+  "title": "JWT Authentication REST API",
+  "description": "Build a REST API with JWT-based authentication. Users should be able to register, login, and access protected routes using a valid token.",
+  "difficulty": "MEDIUM",
+  "tags": ["auth", "jwt", "rest-api", "backend"],
+  "entryFile": "index",
+  "services": ["AUTH", "REST"],
+  "keys": {
+    "JWT_SECRET": "secret123",
+    "PORT": 3000
+  },
+  "timeLimitSeconds": 5,
+  "memoryLimitMB": 512,
+  "cpuLimit": 1.0,
+  "testCases": [
+    {
+      "input": {
+        "email": "test@example.com",
+        "password": "password123"
+      },
+      "expectedOutput": {
+        "message": "User registered successfully"
+      },
+      "expectedStatus": 201,
+      "isHidden": false,
+      "method": "POST",
+      "endpoint": "/auth/register"
+    },
+    {
+      "input": {
+        "email": "test@example.com",
+        "password": "password123"
+      },
+      "expectedOutput": {
+        "token": "jwt-token"
+      },
+      "expectedStatus": 200,
+      "isHidden": true,
+      "method": "POST",
+      "endpoint": "/auth/login"
+    },
+    {
+      "input": {},
+      "expectedOutput": {
+        "error": "Unauthorized"
+      },
+      "expectedStatus": 401,
+      "isHidden": true,
+      "method": "GET",
+      "endpoint": "/api/protected"
+    }
+  ]
+}
+------DevProBoundary
+Content-Disposition: form-data; name="composeFiles"; filename="express-js-compose.yml"
+Content-Type: application/x-yaml
+
+< D:\DevPro-lab\devpro-backend\problem-compose-dataset\1\express-js-compose.yml
+------DevProBoundary
+Content-Disposition: form-data; name="composeFiles"; filename="express-ts-compose.yml"
+Content-Type: application/x-yaml
+
+< D:\DevPro-lab\devpro-backend\problem-compose-dataset\1\express-ts-compose.yml
+------DevProBoundary
+Content-Disposition: form-data; name="composeFiles"; filename="fastapi-py-compose.yml"
+Content-Type: application/x-yaml
+
+< D:\DevPro-lab\devpro-backend\problem-compose-dataset\1\fastapi-py-compose.yml
+------DevProBoundary--
+
+<> 2026-02-10T210041.200.json
+
+###
+
+POST http://localhost:9000/api/problems
+X-API-KEY: devpro1580
+Accept: application/json
+Content-Type: multipart/form-data; boundary=----DevProBoundary
+User-Agent: IntelliJ HTTP Client/IntelliJ IDEA 2025.1.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+content-length: 2996
+
+------DevProBoundary
+Content-Disposition: form-data; name="problem"
+Content-Type: application/json
+
+{
+  "title": "JWT Authentication REST API",
+  "description": "Build a REST API with JWT-based authentication. Users should be able to register, login, and access protected routes using a valid token.",
+  "difficulty": "MEDIUM",
+  "tags": ["auth", "jwt", "rest-api", "backend"],
+  "entryFile": "index",
+  "services": ["AUTH", "REST"],
+  "keys": {
+    "JWT_SECRET": "secret123",
+    "PORT": 3000
+  },
+  "timeLimitSeconds": 5,
+  "memoryLimitMB": 512,
+  "cpuLimit": 1.0,
+  "testCases": [
+    {
+      "input": {
+        "email": "test@example.com",
+        "password": "password123"
+      },
+      "expectedOutput": {
+        "message": "User registered successfully"
+      },
+      "expectedStatus": 201,
+      "isHidden": false,
+      "method": "POST",
+      "endpoint": "/auth/register"
+    },
+    {
+      "input": {
+        "email": "test@example.com",
+        "password": "password123"
+      },
+      "expectedOutput": {
+        "token": "jwt-token"
+      },
+      "expectedStatus": 200,
+      "isHidden": true,
+      "method": "POST",
+      "endpoint": "/auth/login"
+    },
+    {
+      "input": {},
+      "expectedOutput": {
+        "error": "Unauthorized"
+      },
+      "expectedStatus": 401,
+      "isHidden": true,
+      "method": "GET",
+      "endpoint": "/api/protected"
+    }
+  ]
+}
+------DevProBoundary
+Content-Disposition: form-data; name="composeFiles"; filename="express-js-compose.yml"
+Content-Type: application/x-yaml
+
+< D:\DevPro-lab\devpro-backend\problem-compose-dataset\1\express-js-compose.yml
+------DevProBoundary
+Content-Disposition: form-data; name="composeFiles"; filename="express-ts-compose.yml"
+Content-Type: application/x-yaml
+
+< D:\DevPro-lab\devpro-backend\problem-compose-dataset\1\express-ts-compose.yml
+------DevProBoundary
+Content-Disposition: form-data; name="composeFiles"; filename="fastapi-py-compose.yml"
+Content-Type: application/x-yaml
+
+< D:\DevPro-lab\devpro-backend\problem-compose-dataset\1\fastapi-py-compose.yml
+------DevProBoundary--
+
+<> 2026-02-10T181857.200.json
+
+###
+
+POST http://localhost:9000/api/problems
+X-API-KEY: devpro1580
+Accept: application/json
+Content-Type: multipart/form-data; boundary=----DevProBoundary
+User-Agent: IntelliJ HTTP Client/IntelliJ IDEA 2025.1.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+content-length: 3011
+
+------DevProBoundary
+Content-Disposition: form-data; name="problem"
+Content-Type: application/json
+
+{
+  "title": "JWT Authentication REST API",
+  "description": "Build a REST API with JWT-based authentication. Users should be able to register, login, and access protected routes using a valid token.",
+  "difficulty": "MEDIUM",
+  "tags": ["auth", "jwt", "rest-api", "backend"],
+  "entryFile": "index",
+  "services": ["AUTH", "REST"],
+  "keys": {
+    "JWT_SECRET": "secret123",
+    "PORT": 3000
+  },
+  "timeLimitSeconds": 5,
+  "memoryLimitMB": 512,
+  "cpuLimit": 1.0,
+  "testCases": [
+    {
+      "input": {
+        "email": "test@example.com",
+        "password": "password123"
+      },
+      "expectedOutput": {
+        "message": "User registered successfully"
+      },
+      "expectedStatus": 201,
+      "isHidden": false,
+      "method": "POST",
+      "endpoint": "/auth/register"
+    },
+    {
+      "input": {
+        "email": "test@example.com",
+        "password": "password123"
+      },
+      "expectedOutput": {
+        "token": "jwt-token"
+      },
+      "expectedStatus": 200,
+      "isHidden": true,
+      "method": "POST",
+      "endpoint": "/auth/login"
+    },
+    {
+      "input": {},
+      "expectedOutput": {
+        "error": "Unauthorized"
+      },
+      "expectedStatus": 401,
+      "isHidden": true,
+      "method": "GET",
+      "endpoint": "/api/protected"
+    }
+  ]
+}
+------DevProBoundary
+Content-Disposition: form-data; name="composeFiles"; filename="express-js-compose.yml"
+Content-Type: application/x-yaml
+
+< D:\DevPro-lab\devpro-backend\problem-compose-dataset\1\express-js-compose.yml
+------DevProBoundary
+Content-Disposition: form-data; name="composeFiles"; filename="express-ts-compose.yml"
+Content-Type: application/x-yaml
+
+< D:\DevPro-lab\devpro-backend\problem-compose-dataset\1\express-ts-compose.yml
+------DevProBoundary
+Content-Disposition: form-data; name="composeFiles"; filename="fastapi-py-compose.yml"
+Content-Type: application/x-yaml
+
+< D:\DevPro-lab\devpro-backend\problem-compose-dataset\1\fastapi-py-compose.yml
+------DevProBoundary--
+
+<> 2026-02-09T155938.200.json
+
+###
+

@@ -1,12 +1,15 @@
 package com.devpro.problem_service.config;
 
+import com.cloudinary.Cloudinary;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class Cloudinary {
+@Configuration
+public class CloudinaryConfig {
     @Value("${cloudinary.cloud-name}")
     private String cloudName;
 

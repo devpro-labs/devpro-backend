@@ -1,0 +1,13 @@
+version: "3.8"
+
+services:
+  base:
+    image: express-js-base:latest
+    restart: unless-stopped
+
+  auth:
+    image: express-js-auth:latest
+    ports:
+      - "3000"
+    restart: unless-stopped
+

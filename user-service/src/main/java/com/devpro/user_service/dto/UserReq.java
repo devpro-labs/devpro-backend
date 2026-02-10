@@ -1,4 +1,13 @@
 package com.devpro.user_service.dto;
 
-public class User {
+import lombok.*;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+public class UserReq {
+    private String username;
+    private String email;
 }

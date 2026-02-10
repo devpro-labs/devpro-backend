@@ -2,33 +2,27 @@ package com.devpro.problem_service.dto;
 
 import com.devpro.problem_service.model.ServiceType;
 import com.fasterxml.jackson.databind.JsonNode;
-import io.hypersistence.utils.hibernate.type.json.JsonBinaryType;
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Type;
-
-import java.time.Instant;
+import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 public class ProblemRequest {
 
     private String title;
     private String description;
     private String difficulty;
     private List<String> tags = new ArrayList<>();;
-
-    private JsonNode imageName;
     private String entryFile;
     private List<ServiceType> services = new ArrayList<>();;
 
     private JsonNode  keys;
+    private List<MultipartFile> composeFiles;
 
     private Integer timeLimitSeconds;
     private Integer memoryLimitMB;

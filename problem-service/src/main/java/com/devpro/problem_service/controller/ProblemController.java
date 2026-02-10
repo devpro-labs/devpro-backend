@@ -1,15 +1,19 @@
 package com.devpro.problem_service.controller;
 
+import java.util.List;
 import java.util.UUID;
 
 import com.devpro.problem_service.model.CustomResponse;
 import com.devpro.problem_service.model.Problem;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.annotation.*;
 
 import com.devpro.problem_service.dto.ProblemRequest;
 import com.devpro.problem_service.service.ProblemService;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/problems")
@@ -22,10 +26,12 @@ public class ProblemController {
     }
 
     // CREATE
-    @PostMapping
+    @PostMapping( consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public CustomResponse create(
-            @RequestBody ProblemRequest request) throws JsonProcessingException {
-        return service.create(request);
+            @RequestPart("problem") ProblemRequest problem,
+            @RequestPart("composeFiles") List<MultipartFile> composeFiles
+    ) throws JsonProcessingException {
+        return service.create(problem, composeFiles);
     }
 
     // READ ALL
@@ -46,8 +52,8 @@ public class ProblemController {
             @PathVariable UUID id,
             @RequestBody ProblemRequest request) {
 
-        CustomResponse response = service.update(id, request);
-        return ResponseEntity.ok(response);
+//        CustomResponse response = service.update(id, request);
+        return ResponseEntity.ok(null);
     }
 
 
@@ -57,5 +63,25 @@ public class ProblemController {
 
         CustomResponse response = service.delete(id);
         return ResponseEntity.ok(response);
+    }
+
+    //get raw
+    @GetMapping("/{id}/raw")
+    public Problem getByIdRaw(@PathVariable UUID id) {
+        return service.getByIdRaw(id);
+    }
+
+    //get file url
+    @GetMapping("/{folderName}/{publicId}/url")
+    public String getPublicUrl(@PathVariable String publicId, @PathVariable String folderName){
+        System.out.println(folderName);
+        return service.getFileUrl(publicId);
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<?> handleMediaTypeError(Exception e) {
+        return ResponseEntity
+                .badRequest()
+                .body("Request must be multipart/form-data");
     }
 }

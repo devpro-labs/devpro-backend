@@ -1,11 +1,9 @@
-package com.devpro.code_runner_service.DTO;
+package com.devpro.user_service.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
-import java.util.List;
 import java.util.Map;
-
 
 
 @Getter
@@ -13,7 +11,7 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class CustomResponse {
+public class Response {
     @JsonProperty("DATA")
     Map<String, Object> data;
 

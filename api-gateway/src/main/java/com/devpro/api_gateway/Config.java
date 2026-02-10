@@ -1,6 +1,7 @@
 package com.devpro.api_gateway;
 
 import io.netty.resolver.DefaultAddressResolverGroup;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -21,6 +22,12 @@ import java.util.List;
 @EnableWebFluxSecurity
 public class Config {
 
+    @Value("${frontend.url}")
+    private String url;
+
+    @Value("${frontend.url2}")
+    private String url2;
+
 
     //for auth
     @Bean
@@ -34,7 +41,7 @@ public class Config {
                                 "/webhook/**",
                                 "/healthcheck",
                                 "/actuator/**",
-                                "/api/problems"
+                                "/api/**"
                         ).permitAll()
                         .anyExchange().authenticated()
                 )
@@ -50,7 +57,7 @@ public class Config {
     public CorsWebFilter corsWebFilter() {
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOrigins(List.of("http://localhost:3000"));
+        config.setAllowedOrigins(List.of(url, url2));
         config.setAllowedMethods(List.of(
                 "GET", "POST", "PUT", "DELETE", "OPTIONS"
         ));

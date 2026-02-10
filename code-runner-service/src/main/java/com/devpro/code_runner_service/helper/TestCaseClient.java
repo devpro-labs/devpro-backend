@@ -1,5 +1,7 @@
 package com.devpro.code_runner_service.helper;
 
+import com.devpro.code_runner_service.DTO.CustomResponse;
+import com.devpro.code_runner_service.models.Problem;
 import com.devpro.code_runner_service.models.TestCase;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,5 +14,15 @@ public interface TestCaseClient {
     @GetMapping("/api/problems/test-cases/problem/{id}/raw")
     List<TestCase> getTestCases(
             @PathVariable("id") String problemId
+    );
+
+    @GetMapping("/api/problems/{id}/raw")
+    Problem getProblem(
+      @PathVariable("id") String problemId
+    );
+
+    @GetMapping("/api/problems/{publicId}/url")
+    String getPublicUrl(
+            @PathVariable("publicId") String publicId
     );
 }

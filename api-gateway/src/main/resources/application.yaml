@@ -60,3 +60,8 @@ admin:
   key: ${APP_API_KEY}
   service:
     key: ${ADMIN_SERVICE_KEY}
+
+#ui url
+frontend:
+  url: ${FRONTEND_URL}
+  url2: ${FRONTEND_URL2}
