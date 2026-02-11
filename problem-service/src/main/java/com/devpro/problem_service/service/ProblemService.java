@@ -36,23 +36,38 @@ public class ProblemService {
         p.setServices(request.getServices());
         p.setCpuLimit(request.getCpuLimit());
         p.setKeys(request.getKeys());
+//        p.setImageName(request.getImageName());
         p.setEntryFile(request.getEntryFile());
         p.setMemoryLimitMB(request.getMemoryLimitMB());
         p.setTimeLimitSeconds(request.getTimeLimitSeconds());
 
-        MultipartFile f1 = composeFiles.getFirst();
-        MultipartFile f2 = composeFiles.get(1);
-        MultipartFile f3 = composeFiles.getLast();
+        if (composeFiles != null && !composeFiles.isEmpty()) {
 
-        String id1 = cloudinaryService.addFile(f1);
-        String id2 = cloudinaryService.addFile(f2);
-        String id3 = cloudinaryService.addFile(f3);
+            for (MultipartFile file : composeFiles) {
 
-        mp.put("js-express", id1);
-        mp.put("ts-express", id2);
-        mp.put("py-fastapi", id3);
+                if (file == null || file.isEmpty()) continue;
+
+                String filename = file.getOriginalFilename();
+                if (filename == null) continue;
+
+                filename = filename.toLowerCase();
+
+                String uploadedId = cloudinaryService.addFile(file);
+
+                if (filename.contains("js")) {
+                    mp.put("js-express", uploadedId);
+                }
+                else if (filename.contains("ts")) {
+                    mp.put("ts-express", uploadedId);
+                }
+                else if (filename.contains("py") || filename.contains("fastapi")) {
+                    mp.put("py-fastapi", uploadedId);
+                }
+            }
+        }
 
         p.setComposeFile(mp);
+
     }
 
     public ProblemService(ProblemRepository repository, TestCaseService testCaseService, CloudinaryService cloudinaryService) {

@@ -4,9 +4,9 @@ spring:
 
   #db config
   datasource:
-    url: ${DB_URL}
-    username: ${DB_UNAME}
-    password: ${DB_PASS}
+    url: ${SUPABASE_DB_URL}
+    username: ${SUPABASE_DB_USERNAME}
+    password: ${SUPABASE_DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
 

@@ -2,13 +2,19 @@ spring:
   application:
     name: problem-service
 
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 50MB
+      max-request-size: 50MB
+
 
 
   #database config
   datasource:
-    url: ${DB_URL}
-    username: ${DB_UNAME}
-    password: ${DB_PASS}
+    url: ${SUPABASE_DB_URL}
+    username: ${SUPABASE_DB_USERNAME}
+    password: ${SUPABASE_DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
 

@@ -13,6 +13,9 @@
         <module name="problem-service" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="submission-service" target="21" />
+    </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">

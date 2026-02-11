@@ -33,6 +33,11 @@ public class Problem {
     @Column
     private String difficulty;
 
+    /*  runtime  */
+    @Column(nullable = false, columnDefinition = "jsonb")
+    @Type(JsonBinaryType.class)
+    private JsonNode imageName;
+
     @Column
     private List<String> tags;
 
