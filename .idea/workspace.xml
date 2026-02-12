@@ -5,17 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="13378497-fff7-493a-9603-1f64b1c86a6c" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api-gateway/src/main/java/com/devpro/api_gateway/AuthMiddleware.java" beforeDir="false" afterPath="$PROJECT_DIR$/api-gateway/src/main/java/com/devpro/api_gateway/AuthMiddleware.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/code-runner-service/src/test/java/com/devpro/code_runner_service/CodeRunnerServiceApplicationTests.java" beforeDir="false" afterPath="$PROJECT_DIR$/code-runner-service/src/test/java/com/devpro/code_runner_service/CodeRunnerServiceApplicationTests.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/controller/ProblemController.java" beforeDir="false" afterPath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/controller/ProblemController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api-gateway/src/main/java/com/devpro/api_gateway/Config.java" beforeDir="false" afterPath="$PROJECT_DIR$/api-gateway/src/main/java/com/devpro/api_gateway/Config.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/dto/ProblemRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/dto/ProblemRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/model/Problem.java" beforeDir="false" afterPath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/model/Problem.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/repository/TestCaseRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/repository/TestCaseRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/service/ProblemService.java" beforeDir="false" afterPath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/service/ProblemService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/problem-service/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/problem-service/src/main/resources/application.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/devpro/user_service/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/java/com/devpro/user_service/service/UserService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/resources/application.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/service/TestCaseService.java" beforeDir="false" afterPath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/service/TestCaseService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -98,7 +94,20 @@
         <option value="KtorApplicationConfigurationType" />
         <option value="MicronautRunConfigurationType" />
         <option value="QuarkusRunConfigurationType" />
+        <option value="SpringBootApplicationConfigurationType" />
       </set>
+    </option>
+    <option name="configurationStatuses">
+      <map>
+        <entry key="SpringBootApplicationConfigurationType">
+          <value>
+            <map>
+              <entry key="ProblemServiceApplication" value="STOPPED" />
+              <entry key="gateway" value="STOPPED" />
+            </map>
+          </value>
+        </entry>
+      </map>
     </option>
   </component>
   <component name="RunManager" selected="Spring Boot.gateway">

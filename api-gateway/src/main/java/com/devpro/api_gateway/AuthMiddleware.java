@@ -24,6 +24,10 @@ public class AuthMiddleware implements GlobalFilter, Ordered {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 
+        if (exchange.getRequest().getMethod() == org.springframework.http.HttpMethod.OPTIONS) {
+            return chain.filter(exchange);
+        }
+
         String path = exchange.getRequest().getURI().getPath();
         System.out.println(path + " : path");
 

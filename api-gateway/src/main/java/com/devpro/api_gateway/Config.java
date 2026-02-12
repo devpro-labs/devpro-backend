@@ -35,7 +35,7 @@ public class Config {
 
         http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .cors(cors -> cors.configurationSource(request -> new CorsConfiguration().applyPermitDefaultValues()))
+                .cors(Customizer.withDefaults())
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers(
                                 "/webhook/**",
@@ -63,6 +63,7 @@ public class Config {
         ));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
+        config.setMaxAge(3600L); // cache preflight 1 hour
 
         org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource source =
                 new UrlBasedCorsConfigurationSource();

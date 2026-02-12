@@ -163,7 +163,7 @@ public class ProblemService {
         if (!repository.existsById(id)) {
             throw new RuntimeException("Problem not found");
         }
-
+        testCaseService.deleteByProblemId(id);
         repository.deleteById(id);
 
         return new CustomResponse(
