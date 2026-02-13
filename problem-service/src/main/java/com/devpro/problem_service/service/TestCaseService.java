@@ -163,6 +163,34 @@ public class TestCaseService {
         );
     }
 
+    // ================= DELETE BY PROBLEM =================
+    public CustomResponse deleteByProblemId(UUID problemId) {
+
+        // Optional: Check if problem exists
+        Problem problem = problemRepository.findById(problemId)
+                .orElseThrow(() -> new RuntimeException("Problem not found"));
+
+        List<TestCase> existing = repository.findByProblemId(problemId);
+
+        if (existing.isEmpty()) {
+            return new CustomResponse(
+                    Map.of(),
+                    "No test cases found for this problem",
+                    200,
+                    ""
+            );
+        }
+
+        repository.deleteByProblemId(problemId);
+
+        return new CustomResponse(
+                Map.of(),
+                "All test cases deleted successfully",
+                200,
+                ""
+        );
+    }
+
     public List<TestCase> getTestCasesRaw(UUID problemId) {
         return repository.findByProblemId(problemId);
     }

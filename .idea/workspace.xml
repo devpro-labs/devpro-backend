@@ -30,6 +30,12 @@
       <change beforePath="$PROJECT_DIR$/workdir/preview-83699f07-a399-452e-8955-c6e85f3ea613/index.js" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/workdir/preview-8aae3a0b-b650-4aa3-9b53-987ad392aa70/docker-compose.yml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/workdir/preview-8aae3a0b-b650-4aa3-9b53-987ad392aa70/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/api-gateway/src/main/java/com/devpro/api_gateway/AuthMiddleware.java" beforeDir="false" afterPath="$PROJECT_DIR$/api-gateway/src/main/java/com/devpro/api_gateway/AuthMiddleware.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api-gateway/src/main/java/com/devpro/api_gateway/Config.java" beforeDir="false" afterPath="$PROJECT_DIR$/api-gateway/src/main/java/com/devpro/api_gateway/Config.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/dto/ProblemRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/dto/ProblemRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/repository/TestCaseRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/repository/TestCaseRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/service/ProblemService.java" beforeDir="false" afterPath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/service/ProblemService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/service/TestCaseService.java" beforeDir="false" afterPath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/service/TestCaseService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,6 +57,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;DeepPrajapati1580&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/devpro-labs/devpro-backend.git&quot;,
+    &quot;accountId&quot;: &quot;a36bf1f8-1fd8-4544-8adc-3544cf3cdc00&quot;
+  }
+}</component>
   <component name="KubernetesApiPersistence">{}</component>
   <component name="KubernetesApiProvider">{
   &quot;isMigrated&quot;: true
@@ -78,6 +96,7 @@
     &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
     &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;Spring Boot.CodeRunnerServiceApplication.executor&quot;: &quot;Run&quot;,
     &quot;Spring Boot.ProblemServiceApplication.executor&quot;: &quot;Run&quot;,
@@ -85,6 +104,7 @@
     &quot;Spring Boot.gateway.executor&quot;: &quot;Run&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -103,8 +123,20 @@
         <option value="SpringBootApplicationConfigurationType" />
       </set>
     </option>
+    <option name="configurationStatuses">
+      <map>
+        <entry key="SpringBootApplicationConfigurationType">
+          <value>
+            <map>
+              <entry key="ProblemServiceApplication" value="STOPPED" />
+              <entry key="gateway" value="STOPPED" />
+            </map>
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
-  <component name="RunManager" selected="Spring Boot.UserServiceApplication">
+  <component name="RunManager" selected="Spring Boot.gateway">
     <configuration name=" | Create problem (JSON + multiple compose files)" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/problem-compose-dataset/.http" executionIdentifier="Create problem (JSON + multiple compose files)" runType="Run single request">
       <method v="2" />
     </configuration>
@@ -148,6 +180,15 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration default="true" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+      <option name="ALTERNATIVE_JRE_PATH" value="java" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+      <module name="code-runner-service" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.devpro.code_runner_service.CodeRunnerServiceApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="gateway" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
       <option name="envFilePaths">
         <option value="$PROJECT_DIR$/api-gateway/.env" />
@@ -165,14 +206,15 @@
       <item itemvalue="HTTP Request. | Create problem (JSON + multiple compose files)#2" />
       <item itemvalue="HTTP Request. | Create problem (JSON + multiple compose files)" />
       <item itemvalue="HTTP Request.All in " />
-      <item itemvalue="Spring Boot.gateway" />
-      <item itemvalue="Spring Boot.CodeRunnerServiceApplication" />
       <item itemvalue="Spring Boot.ProblemServiceApplication" />
+      <item itemvalue="Spring Boot.CodeRunnerServiceApplication" />
+      <item itemvalue="Spring Boot.gateway" />
       <item itemvalue="Spring Boot.UserServiceApplication" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="HTTP Request.All in " />
+        <item itemvalue="Spring Boot.CodeRunnerServiceApplication" />
         <item itemvalue="HTTP Request. | Create problem (JSON + multiple compose files)#2" />
         <item itemvalue="HTTP Request. | Create problem (JSON + multiple compose files)" />
       </list>
@@ -181,8 +223,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-fbdcb00ec9e3-intellij.indexing.shared.core-IU-251.26927.53" />
-        <option value="bundled-js-predefined-d6986cc7102b-09060db00ec0-JavaScript-IU-251.26927.53" />
+        <option value="bundled-jdk-30f59d01ecdd-cffe25b9f5b3-intellij.indexing.shared.core-IU-253.28294.334" />
       </set>
     </attachedChunks>
   </component>

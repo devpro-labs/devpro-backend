@@ -131,19 +131,19 @@ public class UserService {
     }
 
 
-    public Response userProfile(HttpServletRequest request){
-        try{
-
-            
-
-        }catch (Exception e){
-            return new Response(
-                    null,
-                    e.getMessage(),
-                    500,
-                    e.toString()
-            );
-        }
-    }
+//    public Response userProfile(HttpServletRequest request){
+//        try{
+//
+//
+//
+//        }catch (Exception e){
+//            return new Response(
+//                    null,
+//                    e.getMessage(),
+//                    500,
+//                    e.toString()
+//            );
+//        }
+//    }
 
 }

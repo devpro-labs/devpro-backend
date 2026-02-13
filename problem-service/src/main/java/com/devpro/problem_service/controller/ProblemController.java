@@ -6,6 +6,7 @@ import java.util.UUID;
 import com.devpro.problem_service.model.CustomResponse;
 import com.devpro.problem_service.model.Problem;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
@@ -26,11 +27,19 @@ public class ProblemController {
     }
 
     // CREATE
-    @PostMapping( consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public CustomResponse create(
-            @RequestPart("problem") ProblemRequest problem,
-            @RequestPart("composeFiles") List<MultipartFile> composeFiles
-    ) throws JsonProcessingException {
+            @RequestPart("problem") String problemJson,
+            @RequestPart(value = "composeFiles", required = false) List<MultipartFile> composeFiles
+    ) throws Exception {
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        ProblemRequest problem = mapper.readValue(problemJson, ProblemRequest.class);
+
+        System.out.println("TITLE: " + problem.getTitle());
+        System.out.println("FILES: " + (composeFiles != null ? composeFiles.size() : 0));
+
         return service.create(problem, composeFiles);
     }
 
