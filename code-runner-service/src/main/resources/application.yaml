@@ -13,6 +13,8 @@ spring:
 #port
 server:
   port: 8083
+  max-http-request-header-size: 64KB
+
 
 #consul client
 
@@ -22,3 +24,4 @@ management:
     web:
       exposure:
         include: health, info
+

@@ -1,9 +1,29 @@
 version: "3.8"
 
 services:
-  base:
-    image: express-js-base:latest
+  express:
+    image: express-js
     ports:
       - "3000"
     restart: unless-stopped
+    volumes:
+      - ${PROJECT_PATH}:/app/src
+    environment:
+      - PORT=3000
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+        - redis
+    networks:
+        - app-network
 
+  redis:
+    image: redis-common
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+
+networks:
+    app-network:
+      driver: bridge

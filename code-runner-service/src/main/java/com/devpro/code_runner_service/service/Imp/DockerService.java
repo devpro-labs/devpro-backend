@@ -4,12 +4,14 @@ import com.devpro.code_runner_service.DTO.CustomResponse;
 import com.devpro.code_runner_service.DTO.DockerRunner;
 import com.devpro.code_runner_service.DTO.FileNode;
 import com.devpro.code_runner_service.DTO.PreviewURL;
+import com.devpro.code_runner_service.config.LogWebSocketHandler;
 import com.devpro.code_runner_service.helper.TestCaseHelper;
 import com.devpro.code_runner_service.models.Problem;
 import com.devpro.code_runner_service.service.IDockerRepo;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.async.ResultCallback;
 import com.github.dockerjava.api.model.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -22,6 +24,7 @@ import java.util.*;
 import java.util.concurrent.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class DockerService implements IDockerRepo {
 
@@ -112,33 +115,99 @@ public class DockerService implements IDockerRepo {
         }
     }
 
-    private void streamContainerLogs(String containerId) {
+    private void streamContainerLogs(String containerId, String submissionId) {
+        log.info("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS" +
+                " Starting log stream for container inside {}", containerId);
         new Thread(() -> {
             try {
+
+                StringBuilder errorBuffer = new StringBuilder();
+
                 dockerClient.logContainerCmd(containerId)
                         .withStdOut(true)
                         .withStdErr(true)
                         .withFollowStream(true)
-                        .withTailAll()
+                        .withTail(100)
                         .exec(new ResultCallback.Adapter<Frame>() {
+
                             @Override
                             public void onNext(Frame frame) {
-                                System.out.print(
-                                        "[CONTAINER " + containerId.substring(0, 6) + "] "
-                                                + new String(frame.getPayload())
+
+                                String log = new String(frame.getPayload(), StandardCharsets.UTF_8);
+
+                                // Always send raw logs
+                                LogWebSocketHandler.sendEvent(
+                                        submissionId,
+                                        "LOG",
+                                        log
                                 );
+
+                                // If STDERR → treat as runtime error
+                                if (frame.getStreamType() == StreamType.STDERR) {
+
+                                    errorBuffer.append(log);
+
+                                    LogWebSocketHandler.sendEvent(
+                                            submissionId,
+                                            "ERROR",
+                                            log
+                                    );
+                                }
                             }
 
                             @Override
                             public void onComplete() {
-                                System.out.println("[CONTAINER LOG STREAM CLOSED]");
+
+                                // If there was collected error stack
+                                if (!errorBuffer.isEmpty()) {
+                                    LogWebSocketHandler.sendEvent(
+                                            submissionId,
+                                            "ERROR",
+                                            errorBuffer.toString()
+                                    );
+                                }
+
+                                LogWebSocketHandler.sendEvent(
+                                        submissionId,
+                                        "LOG",
+                                        "Container stopped"
+                                );
+
+                                LogWebSocketHandler.removeSession(submissionId);
+
+                                System.out.println(
+                                        "[CONTAINER " + containerId.substring(0, 6) + "] LOG STREAM CLOSED"
+                                );
+                            }
+
+                            @Override
+                            public void onError(Throwable throwable) {
+
+                                LogWebSocketHandler.sendEvent(
+                                        submissionId,
+                                        "ERROR",
+                                        "Log stream failed: " + throwable.getMessage()
+                                );
+
+                                LogWebSocketHandler.removeSession(submissionId);
+
+                                throwable.printStackTrace();
                             }
                         });
+
             } catch (Exception e) {
-                System.err.println("Log stream error: " + e.getMessage());
+
+                LogWebSocketHandler.sendEvent(
+                        submissionId,
+                        "ERROR",
+                        "Failed to stream logs: " + e.getMessage()
+                );
+
+                e.printStackTrace();
             }
         }).start();
     }
+
 
     /**
      * get public url
@@ -188,6 +257,9 @@ public class DockerService implements IDockerRepo {
         ProcessBuilder pb = new ProcessBuilder(
                 "docker", "compose", "ps", "-q"
         );
+        String path = projectDir.getAbsolutePath().replace("\\", "/");
+        pb.environment().put("PROJECT_PATH", path);
+
         pb.directory(projectDir);
 
         Process process = pb.start();
@@ -207,13 +279,14 @@ public class DockerService implements IDockerRepo {
 
 
     // 🔹 docker compose up
-    private String runCompose(File projectDir) throws Exception {
+    private String runCompose(File projectDir, String previewId) throws Exception {
 
         //1. run compose file
         ProcessBuilder pb = new ProcessBuilder(
                 "docker", "compose", "up", "-d"
         );
         pb.directory(projectDir);
+        pb.environment().put("PROJECT_PATH", projectDir.getAbsolutePath());
         pb.redirectErrorStream(true);
 
         Process process = pb.start();
@@ -225,6 +298,7 @@ public class DockerService implements IDockerRepo {
 
         int exitCode = process.waitFor();
         if (exitCode != 0) {
+//            LogWebSocketHandler.sendEvent(previewId,"LOG","docker compose up failed");
             throw new RuntimeException("docker compose up failed");
         }
 
@@ -238,7 +312,7 @@ public class DockerService implements IDockerRepo {
      */
     private int getComposePort(String containerId) throws Exception {
         ProcessBuilder pb = new ProcessBuilder(
-                "docker", "port", containerId , String.valueOf(3000)
+                "docker", "port", containerId, String.valueOf(3000)
         );
         pb.redirectErrorStream(true);
 
@@ -262,6 +336,7 @@ public class DockerService implements IDockerRepo {
                 "docker", "compose", "ps", "-q"
         );
         pb.directory(projectDir);
+        pb.environment().put("PROJECT_PATH", projectDir.getAbsolutePath());
 
         Process process = pb.start();
 
@@ -425,11 +500,10 @@ public class DockerService implements IDockerRepo {
 //        }
 //    }
     @Override
-    public CustomResponse getPreviewURL(DockerRunner runner, Problem problem) {
+    public CustomResponse getPreviewURL(DockerRunner runner, Problem problem, String previewId) {
         try {
             System.out.println("========== PREVIEW REQUEST ==========");
 
-            String previewId = UUID.randomUUID().toString();
             String projectRoot = new File(".").getCanonicalPath()
                     + "/workdir/preview-" + previewId;
 
@@ -450,14 +524,17 @@ public class DockerService implements IDockerRepo {
             writeComposeFile(composeFile, projectDir.toPath());
 
             // docker compose up
-            String containerId =  runCompose(projectDir);
+            String containerId = runCompose(projectDir, previewId);
+            System.out.println("RUN COMPOSE DONE, containerId = " + containerId);
+
+            LogWebSocketHandler.bindContainer(previewId, containerId);
 
             // stream logs
-            getRunningContainers(projectDir)
-                    .forEach(this::streamContainerLogs);
+            streamContainerLogs(containerId, previewId);
+
 
             // detect port
-            int hostPort = getComposePort( containerId);
+            int hostPort = getComposePort(containerId);
 
             // health check
             waitForServer(hostPort);
@@ -512,6 +589,7 @@ public class DockerService implements IDockerRepo {
             }
             Thread.sleep(1000);
         }
+        LogWebSocketHandler.sendEvent("compose-preview-1","LOG","Server failed to start");
         throw new RuntimeException("Server failed to start");
     }
 

@@ -2,10 +2,12 @@ package com.devpro.code_runner_service.helper;
 
 import com.devpro.code_runner_service.DTO.CustomResponse;
 import com.devpro.code_runner_service.DTO.PreviewURL;
+import com.devpro.code_runner_service.config.LogWebSocketHandler;
 import com.devpro.code_runner_service.models.Problem;
 import com.devpro.code_runner_service.models.TestCase;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -13,10 +15,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 
+@Slf4j
 @Service
 public class TestCaseHelper {
+
     private final TestCaseClient testCaseClient;
     private final WebClient webClient;
 
@@ -38,14 +44,25 @@ public class TestCaseHelper {
     }
 
     private List<TestCase> getSampleTestCases(String uuid) {
-        return testCaseClient.getTestCases(uuid).stream().filter((tc) -> tc.getIsHidden() == false).toList();
+        return testCaseClient.getTestCases(uuid)
+                .stream()
+                .filter(tc -> !tc.getIsHidden())
+                .toList();
     }
 
-    private CustomResponse TestCaseChecker(
+    // ---------------------------------------------------
+    // 🔥 MAIN TESTCASE EXECUTION ENGINE
+    // ---------------------------------------------------
+    private void testCaseChecker(
             List<TestCase> testCases,
             PreviewURL url,
-            Boolean isSample
+            Boolean isSample,
+            String executionId
     ) {
+
+        log.info("ExecutionId={} | Starting Testcase Execution | Total={}",
+                executionId,
+                testCases.size());
 
         int passedCount = 0;
         List<Map<String, Object>> testCaseReports = new ArrayList<>();
@@ -55,6 +72,14 @@ public class TestCaseHelper {
 
             TestCase testCase = testCases.get(i);
             Map<String, Object> report = new HashMap<>();
+
+            Instant startTime = Instant.now();
+
+            log.info("ExecutionId={} | Running TestCase #{} | {} {}",
+                    executionId,
+                    i + 1,
+                    testCase.getMethod(),
+                    testCase.getEndpoint());
 
             report.put("testCaseNo", i + 1);
             report.put("method", testCase.getMethod());
@@ -67,7 +92,8 @@ public class TestCaseHelper {
 
             try {
 
-                HttpMethod httpMethod = HttpMethod.valueOf(testCase.getMethod().toString());
+                HttpMethod httpMethod =
+                        HttpMethod.valueOf(testCase.getMethod().toString());
 
                 ResponseEntity<JsonNode> responseEntity = webClient
                         .method(httpMethod)
@@ -84,6 +110,12 @@ public class TestCaseHelper {
                 report.put("actualStatus", actualStatus);
                 report.put("actualBody", actualBody);
 
+                log.info("ExecutionId={} | TestCase #{} | ExpectedStatus={} | ActualStatus={}",
+                        executionId,
+                        i + 1,
+                        testCase.getExpectedStatus(),
+                        actualStatus);
+
                 if (actualStatus == testCase.getExpectedStatus()
                         && Objects.equals(actualBody, testCase.getExpectedOutputJson())) {
 
@@ -91,14 +123,22 @@ public class TestCaseHelper {
                     isPassed = true;
                     passedCount++;
 
+                    log.info("ExecutionId={} | TestCase #{} PASSED ✅",
+                            executionId,
+                            i + 1);
+
                 } else {
 
                     report.put("status", "FAILED");
                     report.put("error",
                             actualStatus != testCase.getExpectedStatus()
                                     ? "Status code mismatch"
-                                    : "Response body mismatch"
-                    );
+                                    : "Response body mismatch");
+
+                    log.warn("ExecutionId={} | TestCase #{} FAILED ❌ | Reason={}",
+                            executionId,
+                            i + 1,
+                            report.get("error"));
                 }
 
             } catch (WebClientResponseException ex) {
@@ -107,96 +147,95 @@ public class TestCaseHelper {
                 report.put("actualStatus", actualStatus);
 
                 try {
-                    JsonNode actualBody = new ObjectMapper()
-                            .readTree(ex.getResponseBodyAsString());
+                    JsonNode actualBody =
+                            new ObjectMapper().readTree(ex.getResponseBodyAsString());
                     report.put("actualBody", actualBody);
                 } catch (Exception e) {
                     report.put("actualBody", ex.getResponseBodyAsString());
                 }
 
-                if (actualStatus == testCase.getExpectedStatus()) {
-
-                    try {
-                        JsonNode actualBody = new ObjectMapper()
-                                .readTree(ex.getResponseBodyAsString());
-
-                        if (actualBody.equals(testCase.getExpectedOutputJson())) {
-                            report.put("status", "PASSED");
-                            isPassed = true;
-                            passedCount++;
-                        } else {
-                            report.put("status", "FAILED");
-                            report.put("error", "Response body mismatch");
-                        }
-
-                    } catch (Exception e) {
-                        report.put("status", "FAILED");
-                        report.put("error", "Invalid response body");
-                    }
-
-                } else {
-                    report.put("status", "FAILED");
-                    report.put("error", "Status code mismatch");
-                }
-
-            } catch (Exception ex) {
-
                 report.put("status", "FAILED");
                 report.put("error", ex.getMessage());
+
+                log.error("ExecutionId={} | TestCase #{} ERROR ❌ | {}",
+                        executionId,
+                        i + 1,
+                        ex.getMessage());
             }
 
-            // -----------------------------
-            // LEETCODE STYLE EXIT
-            // -----------------------------
+            // ⏱ Execution time log
+            long timeTaken =
+                    Duration.between(startTime, Instant.now()).toMillis();
+
+            report.put("executionTimeMs", timeTaken);
+
+            log.info("ExecutionId={} | TestCase #{} | Time={} ms",
+                    executionId,
+                    i + 1,
+                    timeTaken);
+
+            // 🔥 Early exit for SUBMIT mode
             if (!isSample && !"PASSED".equals(report.get("status"))) {
 
                 DATA.put("PassedTestcases", passedCount);
                 DATA.put("FailedAt", i + 1);
                 DATA.put("Result", report);
 
-                return new CustomResponse(
-                        DATA,
-                        "Wrong Answer",
-                        200,
-                        "Testcase " + (i + 1) + " failed"
+                LogWebSocketHandler.sendEvent(
+                        executionId,
+                        "SUBMIT",
+                        new CustomResponse(
+                                DATA,
+                                "Wrong Answer",
+                                200,
+                                "Testcase " + (i + 1) + " failed"
+                        )
                 );
+
+                log.warn("ExecutionId={} | Submission stopped at TestCase #{}",
+                        executionId,
+                        i + 1);
+
+                return; // stop further execution
             }
 
             testCaseReports.add(report);
         }
 
-        // -----------------------------
-        // SAMPLE MODE FULL REPORT
-        // -----------------------------
+        // Final summary
         DATA.put("TotalTestcases", testCases.size());
         DATA.put("PassedTestcases", passedCount);
         DATA.put("FailedTestcases", testCases.size() - passedCount);
         DATA.put("Reports", testCaseReports);
 
-        return new CustomResponse(
-                DATA,
-                "All testcases executed",
-                200,
-                "Execution finished"
+        log.info("ExecutionId={} | Finished | Passed={} | Failed={}",
+                executionId,
+                passedCount,
+                testCases.size() - passedCount);
+
+        LogWebSocketHandler.sendEvent(
+                executionId,
+                "TESTCASE",
+                new CustomResponse(
+                        DATA,
+                        "All testcases executed",
+                        200,
+                        "Execution finished"
+                )
         );
     }
 
+    // ---------------------------------------------------
+    // PUBLIC METHODS
+    // ---------------------------------------------------
 
-
-    public CustomResponse codeRun(String uuid, PreviewURL url) {
-
-        //get test-cases
+    public void codeRun(String uuid, PreviewURL url, String executionId) {
         List<TestCase> testCases = getSampleTestCases(uuid);
-
-        //check one by one
-        return TestCaseChecker(testCases, url, true);
+        testCaseChecker(testCases, url, true, executionId);
     }
 
-    public CustomResponse codeSubmit(String uuid, PreviewURL url) {
-        //get-testcase
+    public void codeSubmit(String uuid, PreviewURL url, String executionId) {
         List<TestCase> testCases = getTestCase(uuid);
-
-        //check one by one
-        return TestCaseChecker(testCases, url, false);
+        testCaseChecker(testCases, url, false, executionId);
     }
 }

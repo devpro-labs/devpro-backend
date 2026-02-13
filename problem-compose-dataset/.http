@@ -9,87 +9,6 @@ Content-Disposition: form-data; name="problem"
 Content-Type: application/json
 
 {
-  "title": "JWT Authentication REST API",
-  "description": "Build a REST API with JWT-based authentication. Users should be able to register, login, and access protected routes using a valid token.",
-  "difficulty": "MEDIUM",
-  "tags": ["auth", "jwt", "rest-api", "backend"],
-  "entryFile": "index",
-  "services": ["AUTH", "REST"],
-  "keys": {
-    "JWT_SECRET": "secret123",
-    "PORT": 3000
-  },
-  "timeLimitSeconds": 5,
-  "memoryLimitMB": 512,
-  "cpuLimit": 1.0,
-  "testCases": [
-    {
-      "input": {
-        "email": "test@example.com",
-        "password": "password123"
-      },
-      "expectedOutput": {
-        "message": "User registered successfully"
-      },
-      "expectedStatus": 201,
-      "isHidden": false,
-      "method": "POST",
-      "endpoint": "/auth/register"
-    },
-    {
-      "input": {
-        "email": "test@example.com",
-        "password": "password123"
-      },
-      "expectedOutput": {
-        "token": "jwt-token"
-      },
-      "expectedStatus": 200,
-      "isHidden": true,
-      "method": "POST",
-      "endpoint": "/auth/login"
-    },
-    {
-      "input": {},
-      "expectedOutput": {
-        "error": "Unauthorized"
-      },
-      "expectedStatus": 401,
-      "isHidden": true,
-      "method": "GET",
-      "endpoint": "/api/protected"
-    }
-  ]
-}
-------DevProBoundary
-Content-Disposition: form-data; name="composeFiles"; filename="express-js-compose.yml"
-Content-Type: application/x-yaml
-
-< ./1/express-js-compose.yml
-------DevProBoundary
-Content-Disposition: form-data; name="composeFiles"; filename="express-ts-compose.yml"
-Content-Type: application/x-yaml
-
-< ./1/express-ts-compose.yml
-------DevProBoundary
-Content-Disposition: form-data; name="composeFiles"; filename="fastapi-py-compose.yml"
-Content-Type: application/x-yaml
-
-< ./1/fastapi-py-compose.yml
-------DevProBoundary--
-
-
-### Create problem (JSON + multiple compose files)
-POST http://localhost:9000/api/problems
-X-API-KEY: devpro1580
-Accept: application/json
-Content-Type: multipart/form-data; boundary=----DevProBoundary
-
-------DevProBoundary
-Content-Disposition: form-data; name="problem"
-Content-Type: application/json
-
-{
   "title": "User Management REST API (CRUD)",
   "description": "Build a REST API to manage users using CRUD operations. The API should allow creating, retrieving, updating, and deleting users. Each user should have an id, name, email, and age. Data can be stored in memory or a simple database.",
   "difficulty": "EASY",
@@ -196,6 +115,119 @@ Content-Type: application/json
       "isHidden": true,
       "method": "GET",
       "endpoint": "/users"
+    }
+  ]
+}
+------DevProBoundary
+Content-Disposition: form-data; name="composeFiles"; filename="express-js-compose.yml"
+Content-Type: application/x-yaml
+
+< ./1/express-js-compose.yml
+------DevProBoundary
+Content-Disposition: form-data; name="composeFiles"; filename="express-js-compose.yml"
+Content-Type: application/x-yaml
+
+< ./1/express-js-compose.yml
+------DevProBoundary
+Content-Disposition: form-data; name="composeFiles"; filename="express-js-compose.yml"
+Content-Type: application/x-yaml
+
+< ./1/express-js-compose.yml
+------DevProBoundary--
+
+
+### Create problem (JSON + multiple compose files)
+POST http://localhost:9000/api/problems
+X-API-KEY: devpro1580
+Accept: application/json
+Content-Type: multipart/form-data; boundary=----DevProBoundary
+
+------DevProBoundary
+Content-Disposition: form-data; name="problem"
+Content-Type: application/json
+
+{
+  "title": "Redis Key-Value Store API",
+  "description": "Build a REST API using Redis as the primary data store. The API should allow setting, retrieving, deleting, and listing key-value pairs. Each key should map to a string value. Use Redis commands for storage instead of in-memory arrays.",
+  "difficulty": "MEDIUM",
+  "tags": ["redis", "backend", "rest-api", "docker"],
+  "entryFile": "index",
+  "services": ["REST", "REDIS"],
+  "keys": {
+    "PORT": 3000,
+    "REDIS_HOST": "redis",
+    "REDIS_PORT": 6379
+  },
+  "timeLimitSeconds": 5,
+  "memoryLimitMB": 512,
+  "cpuLimit": 1.0,
+
+  "testCases": [
+    {
+      "input": {
+        "key": "username",
+        "value": "devan"
+      },
+      "expectedOutput": {
+        "message": "Key set successfully",
+        "key": "username",
+        "value": "devan"
+      },
+      "expectedStatus": 201,
+      "isHidden": false,
+      "method": "POST",
+      "endpoint": "/store"
+    },
+    {
+      "input": {},
+      "expectedOutput": {
+        "key": "username",
+        "value": "devan"
+      },
+      "expectedStatus": 200,
+      "isHidden": false,
+      "method": "GET",
+      "endpoint": "/store/username"
+    },
+    {
+      "input": {},
+      "expectedOutput": {
+        "message": "Key deleted successfully"
+      },
+      "expectedStatus": 200,
+      "isHidden": false,
+      "method": "DELETE",
+      "endpoint": "/store/username"
+    },
+    {
+      "input": {},
+      "expectedOutput": {
+        "error": "Key not found"
+      },
+      "expectedStatus": 404,
+      "isHidden": true,
+      "method": "GET",
+      "endpoint": "/store/unknown"
+    },
+    {
+      "input": {},
+      "expectedOutput": {
+        "error": "Key not found"
+      },
+      "expectedStatus": 404,
+      "isHidden": true,
+      "method": "DELETE",
+      "endpoint": "/store/unknown"
+    },
+    {
+      "input": {},
+      "expectedOutput": {
+        "keys": []
+      },
+      "expectedStatus": 200,
+      "isHidden": true,
+      "method": "GET",
+      "endpoint": "/store"
     }
   ]
 }

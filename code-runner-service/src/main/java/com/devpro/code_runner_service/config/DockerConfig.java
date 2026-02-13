@@ -1,4 +1,4 @@
-package com.devpro.code_runner_service;
+package com.devpro.code_runner_service.config;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.core.DefaultDockerClientConfig;

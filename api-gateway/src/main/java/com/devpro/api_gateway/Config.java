@@ -41,7 +41,8 @@ public class Config {
                                 "/webhook/**",
                                 "/healthcheck",
                                 "/actuator/**",
-                                "/api/**"
+                                "/api/**",
+                                "/ws/**"
                         ).permitAll()
                         .anyExchange().authenticated()
                 )

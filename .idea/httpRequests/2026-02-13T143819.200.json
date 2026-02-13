@@ -1,0 +1,39 @@
+{
+  "DATA": {
+    "problem": {
+      "id": "e0cd18f6-c780-44b3-a2b2-90f63cbe8046",
+      "title": "Redis Key-Value Store API",
+      "description": "Build a REST API using Redis as the primary data store. The API should allow setting, retrieving, deleting, and listing key-value pairs. Each key should map to a string value. Use Redis commands for storage instead of in-memory arrays.",
+      "difficulty": "MEDIUM",
+      "tags": [
+        "redis",
+        "backend",
+        "rest-api",
+        "docker"
+      ],
+      "entryFile": "index",
+      "services": [
+        "REST",
+        "REDIS"
+      ],
+      "composeFile": {
+        "py-fastapi": "devpro-dev/ye7bwtsurhd846f28dig",
+        "ts-express": "devpro-dev/oaxyrgwcjc3so8l3jyt3",
+        "js-express": "devpro-dev/uppdaxm0clyomgimcqnc"
+      },
+      "keys": {
+        "PORT": 3000,
+        "REDIS_HOST": "redis",
+        "REDIS_PORT": 6379
+      },
+      "timeLimitSeconds": 5,
+      "memoryLimitMB": 512,
+      "cpuLimit": 1.0,
+      "isActive": true,
+      "createdAt": "2026-02-13T09:08:15.481306800Z"
+    }
+  },
+  "MESSAGE": "Successfully created problem",
+  "STATUS": 201,
+  "ERROR": ""
+}
