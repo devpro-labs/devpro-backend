@@ -63,7 +63,6 @@ public class AuthMiddleware implements GlobalFilter, Ordered {
                 .map(auth -> {
 
                     Jwt jwt = auth.getToken();
-                    System.out.println("token "+ jwt.toString());
 
                     ServerHttpRequest request = exchange.getRequest()
                             .mutate()

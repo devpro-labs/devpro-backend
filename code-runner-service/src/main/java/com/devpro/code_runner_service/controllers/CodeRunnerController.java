@@ -4,6 +4,7 @@ import com.devpro.code_runner_service.DTO.CustomResponse;
 import com.devpro.code_runner_service.DTO.DockerRunner;
 import com.devpro.code_runner_service.config.ExecutionRegistry;
 import com.devpro.code_runner_service.service.ICodeRunner;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -31,13 +32,8 @@ public class CodeRunnerController {
     }
 
     @PostMapping("/submit/{id}")
-    public CustomResponse codeSubmitHelper(@PathVariable String id, @RequestBody DockerRunner dockerRunner){
-        return codeRunnerService.submitCode(id, dockerRunner);
-    }
-
-    @GetMapping("/tmp")
-    public String tmp(){
-        return "hello";
+    public CustomResponse codeSubmitHelper(@PathVariable String id, @RequestBody DockerRunner dockerRunner, HttpServletRequest request){
+        return codeRunnerService.submitCode(id, dockerRunner, request);
     }
 
 

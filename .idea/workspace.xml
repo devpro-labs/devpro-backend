@@ -5,37 +5,62 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="13378497-fff7-493a-9603-1f64b1c86a6c" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/code-runner-service/src/main/java/com/devpro/code_runner_service/DTO/ExecutionEvent.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/code-runner-service/src/main/java/com/devpro/code_runner_service/config/CodeRunSocketHandler.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/code-runner-service/src/main/java/com/devpro/code_runner_service/config/LogWebSocketHandler.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/code-runner-service/src/main/java/com/devpro/code_runner_service/config/WebSocket.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/httpRequests/http-requests-log.http" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/httpRequests/http-requests-log.http" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/code-runner-service/src/main/java/com/devpro/code_runner_service/DTO/ContainerDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/code-runner-service/src/main/java/com/devpro/code_runner_service/DTO/SubmissionRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/code-runner-service/src/main/java/com/devpro/code_runner_service/DTO/SubmissionStatus.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/code-runner-service/src/main/java/com/devpro/code_runner_service/config/RedisConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/code-runner-service/src/main/java/com/devpro/code_runner_service/config/RedisExpiryListener.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/code-runner-service/src/main/java/com/devpro/code_runner_service/config/RedisKeyspaceSubscriber.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/clients/UserClient.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/clients/UserHelper.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/controller/SubmissionController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/dto/ProfileUpdateRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/dto/SubmissionRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/repository/SubmissionRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/service/SubmissionService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/user-service/src/main/java/com/devpro/user_service/dto/Difficulty.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/user-service/src/main/java/com/devpro/user_service/dto/Problem.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/user-service/src/main/java/com/devpro/user_service/dto/ProfileUpdateRequest.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/user-service/src/main/java/com/devpro/user_service/dto/Submission.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/user-service/src/main/java/com/devpro/user_service/dto/SubmissionStatus.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/user-service/src/main/java/com/devpro/user_service/repository/ProfileRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-gateway/src/main/java/com/devpro/api_gateway/Config.java" beforeDir="false" afterPath="$PROJECT_DIR$/api-gateway/src/main/java/com/devpro/api_gateway/Config.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/code-runner-service/src/main/java/com/devpro/code_runner_service/CodeRunnerServiceApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/code-runner-service/src/main/java/com/devpro/code_runner_service/CodeRunnerServiceApplication.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/code-runner-service/src/main/java/com/devpro/code_runner_service/DockerConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/code-runner-service/src/main/java/com/devpro/code_runner_service/config/DockerConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/code-runner-service/src/main/java/com/devpro/code_runner_service/controllers/CodeRunnerController.java" beforeDir="false" afterPath="$PROJECT_DIR$/code-runner-service/src/main/java/com/devpro/code_runner_service/controllers/CodeRunnerController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/code-runner-service/src/main/java/com/devpro/code_runner_service/helper/TestCaseHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/code-runner-service/src/main/java/com/devpro/code_runner_service/helper/TestCaseHelper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/code-runner-service/src/main/java/com/devpro/code_runner_service/service/IDockerRepo.java" beforeDir="false" afterPath="$PROJECT_DIR$/code-runner-service/src/main/java/com/devpro/code_runner_service/service/IDockerRepo.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/code-runner-service/src/main/java/com/devpro/code_runner_service/service/Imp/CodeRunnerService.java" beforeDir="false" afterPath="$PROJECT_DIR$/code-runner-service/src/main/java/com/devpro/code_runner_service/service/Imp/CodeRunnerService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/code-runner-service/src/main/java/com/devpro/code_runner_service/service/Imp/DockerService.java" beforeDir="false" afterPath="$PROJECT_DIR$/code-runner-service/src/main/java/com/devpro/code_runner_service/service/Imp/DockerService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/code-runner-service/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/code-runner-service/src/main/resources/application.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/problem-compose-dataset/.http" beforeDir="false" afterPath="$PROJECT_DIR$/problem-compose-dataset/.http" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/problem-compose-dataset/1/express-js-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/problem-compose-dataset/1/express-js-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/problem-compose-dataset/1/express-ts-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/problem-compose-dataset/1/express-ts-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/problem-compose-dataset/1/fastapi-py-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/problem-compose-dataset/1/fastapi-py-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/problem-compose-dataset/2/express-js-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/problem-compose-dataset/2/express-js-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/repository/TestCaseRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/repository/TestCaseRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/workdir/preview-83699f07-a399-452e-8955-c6e85f3ea613/docker-compose.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/workdir/preview-83699f07-a399-452e-8955-c6e85f3ea613/index.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/workdir/preview-8aae3a0b-b650-4aa3-9b53-987ad392aa70/docker-compose.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/workdir/preview-8aae3a0b-b650-4aa3-9b53-987ad392aa70/index.js" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/api-gateway/src/main/java/com/devpro/api_gateway/AuthMiddleware.java" beforeDir="false" afterPath="$PROJECT_DIR$/api-gateway/src/main/java/com/devpro/api_gateway/AuthMiddleware.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-gateway/src/main/java/com/devpro/api_gateway/Config.java" beforeDir="false" afterPath="$PROJECT_DIR$/api-gateway/src/main/java/com/devpro/api_gateway/Config.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api-gateway/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/api-gateway/src/main/resources/application.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code-runner-service/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/code-runner-service/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code-runner-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/code-runner-service/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code-runner-service/src/main/java/com/devpro/code_runner_service/controllers/CodeRunnerController.java" beforeDir="false" afterPath="$PROJECT_DIR$/code-runner-service/src/main/java/com/devpro/code_runner_service/controllers/CodeRunnerController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code-runner-service/src/main/java/com/devpro/code_runner_service/helper/TestCaseClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/code-runner-service/src/main/java/com/devpro/code_runner_service/clients/ProblemClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code-runner-service/src/main/java/com/devpro/code_runner_service/helper/TestCaseHelper.java" beforeDir="false" afterPath="$PROJECT_DIR$/code-runner-service/src/main/java/com/devpro/code_runner_service/helper/TestCaseHelper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code-runner-service/src/main/java/com/devpro/code_runner_service/service/ICodeRunner.java" beforeDir="false" afterPath="$PROJECT_DIR$/code-runner-service/src/main/java/com/devpro/code_runner_service/service/ICodeRunner.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code-runner-service/src/main/java/com/devpro/code_runner_service/service/Imp/CodeRunnerService.java" beforeDir="false" afterPath="$PROJECT_DIR$/code-runner-service/src/main/java/com/devpro/code_runner_service/service/Imp/CodeRunnerService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code-runner-service/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/code-runner-service/src/main/resources/application.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/consul-docker.yml" beforeDir="false" afterPath="$PROJECT_DIR$/local-services.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/local-postgres.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/problem-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/problem-service/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/ProblemServiceApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/ProblemServiceApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/config/ApiKeyFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/config/ApiKeyFilter.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/dto/ProblemRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/dto/ProblemRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/repository/TestCaseRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/repository/TestCaseRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/service/ProblemService.java" beforeDir="false" afterPath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/service/ProblemService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/service/TestCaseService.java" beforeDir="false" afterPath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/service/TestCaseService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/model/Problem.java" beforeDir="false" afterPath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/model/Problem.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/model/Submission.java" beforeDir="false" afterPath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/model/Submission.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/problem-service/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/problem-service/src/main/resources/application.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/devpro/user_service/controllers/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/java/com/devpro/user_service/controllers/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/devpro/user_service/model/Profile.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/java/com/devpro/user_service/model/Profile.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/devpro/user_service/repository/UserRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/java/com/devpro/user_service/repository/UserRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/src/main/java/com/devpro/user_service/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/java/com/devpro/user_service/service/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/resources/application.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/workdir/preview-32050528-b438-4496-830a-1444c8471ad9/docker-compose.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/workdir/preview-32050528-b438-4496-830a-1444c8471ad9/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/workdir/preview-60a6ae1c-5a6e-4c72-b1a2-8271c9252cb5/docker-compose.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/workdir/preview-60a6ae1c-5a6e-4c72-b1a2-8271c9252cb5/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/workdir/preview-896dfc78-7ce5-4d0e-be78-d306b4bc8487/docker-compose.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/workdir/preview-896dfc78-7ce5-4d0e-be78-d306b4bc8487/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/workdir/preview-ad8c4649-0da7-436e-bc0a-43fb2156a4dc/docker-compose.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/workdir/preview-ad8c4649-0da7-436e-bc0a-43fb2156a4dc/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/workdir/preview-ba4cae57-1ae1-427f-94bf-c0d857482b57/docker-compose.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/workdir/preview-ba4cae57-1ae1-427f-94bf-c0d857482b57/index.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/workdir/preview-bf05fcc8-95f9-4259-b6c4-14ee303f65d9/docker-compose.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/workdir/preview-bf05fcc8-95f9-4259-b6c4-14ee303f65d9/index.js" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,8 +74,11 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Spring Component" />
-        <option value="Class" />
         <option value="Record" />
+        <option value="Kotlin Class" />
+        <option value="Interface" />
+        <option value="Enum" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -123,20 +151,8 @@
         <option value="SpringBootApplicationConfigurationType" />
       </set>
     </option>
-    <option name="configurationStatuses">
-      <map>
-        <entry key="SpringBootApplicationConfigurationType">
-          <value>
-            <map>
-              <entry key="ProblemServiceApplication" value="STOPPED" />
-              <entry key="gateway" value="STOPPED" />
-            </map>
-          </value>
-        </entry>
-      </map>
-    </option>
   </component>
-  <component name="RunManager" selected="Spring Boot.gateway">
+  <component name="RunManager" selected="HTTP Request. | Create problem (JSON + multiple compose files)#2">
     <configuration name=" | Create problem (JSON + multiple compose files)" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/problem-compose-dataset/.http" executionIdentifier="Create problem (JSON + multiple compose files)" runType="Run single request">
       <method v="2" />
     </configuration>
@@ -147,7 +163,13 @@
       <method v="2" />
     </configuration>
     <configuration name="CodeRunnerServiceApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+      <option name="envFilePaths">
+        <option value="$PROJECT_DIR$/code-runner-service/.env" />
+      </option>
       <module name="code-runner-service" />
+      <selectedOptions>
+        <option name="environmentVariables" />
+      </selectedOptions>
       <option name="SPRING_BOOT_MAIN_CLASS" value="com.devpro.code_runner_service.CodeRunnerServiceApplication" />
       <method v="2">
         <option name="Make" enabled="true" />
@@ -223,7 +245,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-30f59d01ecdd-cffe25b9f5b3-intellij.indexing.shared.core-IU-253.28294.334" />
+        <option value="bundled-jdk-9823dce3aa75-fbdcb00ec9e3-intellij.indexing.shared.core-IU-251.26927.53" />
+        <option value="bundled-js-predefined-d6986cc7102b-09060db00ec0-JavaScript-IU-251.26927.53" />
       </set>
     </attachedChunks>
   </component>
@@ -241,6 +264,8 @@
       <workItem from="1770899436801" duration="7537000" />
       <workItem from="1770970506661" duration="8596000" />
       <workItem from="1770994118157" duration="598000" />
+      <workItem from="1771062808032" duration="19398000" />
+      <workItem from="1771140306871" duration="15114000" />
     </task>
     <servers />
   </component>

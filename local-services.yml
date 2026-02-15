@@ -1,0 +1,48 @@
+version: "3.8"
+
+services:
+
+  #for consul service registry
+  consul:
+    image:  hashicorp/consul
+    container_name: consul
+    ports:
+      - 8500:8500
+
+
+  #postgres db
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres-devpro
+    ports:
+      - 5432:5432 #db
+    environment:
+      POSTGRES_DB: DevPro-dev
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: devan
+
+
+
+  #see ui or data of postgres
+  adminer:
+    image: adminer:latest
+    container_name: adminer-devpro
+    restart: always
+    ports:
+      - 5433:8080
+    depends_on:
+      - postgres
+
+
+  #redis
+  redis:
+    image: redis:7.2-alpine
+    container_name: devpro-redis
+    ports:
+        - "6379:6379"
+    command: >
+      redis-server
+      --notify-keyspace-events Ex
+      --appendonly yes
+      --requirepass devpro_redis
+    restart: unless-stopped

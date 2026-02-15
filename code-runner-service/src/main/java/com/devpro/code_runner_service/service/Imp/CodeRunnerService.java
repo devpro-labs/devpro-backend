@@ -1,22 +1,26 @@
 package com.devpro.code_runner_service.service.Imp;
 
-import com.devpro.code_runner_service.DTO.CustomResponse;
-import com.devpro.code_runner_service.DTO.DockerRunner;
-import com.devpro.code_runner_service.DTO.PreviewURL;
+import com.devpro.code_runner_service.DTO.*;
 import com.devpro.code_runner_service.config.LogWebSocketHandler;
 import com.devpro.code_runner_service.helper.TestCaseHelper;
 import com.devpro.code_runner_service.models.Problem;
 import com.devpro.code_runner_service.service.ICodeRunner;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
+@Slf4j
 @Service
 public class CodeRunnerService implements ICodeRunner {
 
     private final DockerService dockerService;
     private final TestCaseHelper helper;
+
+    private final Map<String, ContainerDTO> problemIdToContainer= new HashMap<>();
 
     public CodeRunnerService(DockerService dockerService, TestCaseHelper helper) {
         this.dockerService = dockerService;
@@ -46,6 +50,13 @@ public class CodeRunnerService implements ICodeRunner {
 
         try {
 
+            if (problemIdToContainer.containsKey(uuid)) {
+                 ContainerDTO containerDTO = problemIdToContainer.get(uuid);
+                 dockerService.deleteContainer(containerDTO.getContainerId(), containerDTO.getFileId(), containerDTO.getFileName());
+                 problemIdToContainer.remove(uuid);
+            }
+
+
             // 1️⃣ Get problem
             Problem problem = helper.getProblemById(uuid);
             System.out.println("problem got it brooooooooooooooooooooooooooooooooo " + problem);
@@ -71,6 +82,9 @@ public class CodeRunnerService implements ICodeRunner {
             // 4️⃣ Cleanup
 //            dockerService.deleteContainer(containerId, fileId, fileName);
 
+            ContainerDTO containerDTO = new ContainerDTO(containerId, fileId, fileName);
+            problemIdToContainer.put(uuid, containerDTO);
+
 //            LogWebSocketHandler.cleanup(executionId);
 
         } catch (Exception e) {
@@ -81,7 +95,7 @@ public class CodeRunnerService implements ICodeRunner {
 
 
     @Override
-    public CustomResponse submitCode(String uuid, DockerRunner dockerRunner) {
+    public CustomResponse submitCode(String uuid, DockerRunner dockerRunner, HttpServletRequest request) {
 
         Problem problem = helper.getProblemById(uuid);
 //        //docker container
@@ -96,10 +110,24 @@ public class CodeRunnerService implements ICodeRunner {
 
 
         //run code - sample and hidden testcases
-        helper.codeSubmit(uuid, url, " ");
-
+        CustomResponse customResponse = helper.codeSubmit(uuid, url, " ");
         //delete code
         dockerService.deleteContainer(cid, fileId, fileName);
+
+        log.info("response is {}", customResponse.toString());
+
+        SubmissionRequest submissionRequest = new SubmissionRequest();
+        submissionRequest.setProblemId(UUID.fromString(uuid));
+        submissionRequest.setFramework(dockerRunner.getLibOrFramework());
+        submissionRequest.setUserId(request.getHeader("X-User-Id"));
+        submissionRequest.setTotalTestcases((Integer) customResponse.getData().get("TotalTestcases"));
+        submissionRequest.setTestcasesPassed((Integer) customResponse.getData().get("PassedTestcases"));
+        submissionRequest.setStatus((SubmissionStatus) customResponse.getData().get("Status"));
+        log.info("submissionRequest is {}", submissionRequest.toString());
+        log.info("SubmissionReq is ready ...................");
+
+        //call submission
+        helper.createSubmission(submissionRequest);
 
         return response;
     }

@@ -26,6 +26,7 @@ public class ApiKeyFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
 
         String method = request.getMethod();
+        String path = request.getRequestURI();
 
         // Allow all READ operations
         if ("GET".equalsIgnoreCase(method)) {
@@ -33,16 +34,14 @@ public class ApiKeyFilter extends OncePerRequestFilter {
             return;
         }
 
-        // Check API key for write operations
-        String requestApiKey = request.getHeader(HEADER_NAME);
-        System.out.println(requestApiKey + " get it");
-        if (requestApiKey == null || !requestApiKey.equals(apiKey)) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write("Invalid or missing API Key");
-            return;
+        if (path.startsWith("/api/problems") && method.equalsIgnoreCase("POST")){
+            String requestApiKey = request.getHeader(HEADER_NAME);
+            if (requestApiKey == null || !requestApiKey.equals(apiKey)) {
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.getWriter().write("Invalid or missing API Key");
+                return;
+            }
         }
-
-        System.out.println("great ");
 
         filterChain.doFilter(request, response);
     }

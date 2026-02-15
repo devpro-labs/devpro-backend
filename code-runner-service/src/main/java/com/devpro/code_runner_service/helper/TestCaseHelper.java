@@ -2,11 +2,15 @@ package com.devpro.code_runner_service.helper;
 
 import com.devpro.code_runner_service.DTO.CustomResponse;
 import com.devpro.code_runner_service.DTO.PreviewURL;
+import com.devpro.code_runner_service.DTO.SubmissionRequest;
+import com.devpro.code_runner_service.DTO.SubmissionStatus;
+import com.devpro.code_runner_service.clients.ProblemClient;
 import com.devpro.code_runner_service.config.LogWebSocketHandler;
 import com.devpro.code_runner_service.models.Problem;
 import com.devpro.code_runner_service.models.TestCase;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -23,28 +27,33 @@ import java.util.*;
 @Service
 public class TestCaseHelper {
 
-    private final TestCaseClient testCaseClient;
+    private final ProblemClient problemClient;
     private final WebClient webClient;
 
-    public TestCaseHelper(TestCaseClient testCaseClient, WebClient webClient) {
-        this.testCaseClient = testCaseClient;
+    public TestCaseHelper(ProblemClient problemClient, WebClient webClient) {
+        this.problemClient = problemClient;
         this.webClient = webClient;
     }
 
     private List<TestCase> getTestCase(String uuid) {
-        return testCaseClient.getTestCases(uuid);
+        return problemClient.getTestCases(uuid);
     }
 
-    public String getPublicUrl(String publicId){
-        return testCaseClient.getPublicUrl(publicId);
+    public String getPublicUrl(String publicId) {
+        return problemClient.getPublicUrl(publicId);
     }
 
-    public Problem getProblemById(String uuid){
-        return testCaseClient.getProblem(uuid);
+    public Problem getProblemById(String uuid) {
+        return problemClient.getProblem(uuid);
+    }
+
+    public CustomResponse createSubmission(SubmissionRequest submissionRequest) {
+        log.info("Request is send...........");
+        return problemClient.saveSubmission(submissionRequest);
     }
 
     private List<TestCase> getSampleTestCases(String uuid) {
-        return testCaseClient.getTestCases(uuid)
+        return problemClient.getTestCases(uuid)
                 .stream()
                 .filter(tc -> !tc.getIsHidden())
                 .toList();
@@ -53,7 +62,7 @@ public class TestCaseHelper {
     // ---------------------------------------------------
     // 🔥 MAIN TESTCASE EXECUTION ENGINE
     // ---------------------------------------------------
-    private void testCaseChecker(
+    private CustomResponse testCaseChecker(
             List<TestCase> testCases,
             PreviewURL url,
             Boolean isSample,
@@ -75,11 +84,13 @@ public class TestCaseHelper {
 
             Instant startTime = Instant.now();
 
-            log.info("ExecutionId={} | Running TestCase #{} | {} {}",
+            log.info("ExecutionId={} | Running TestCase #{} | {} {} | {} | {}",
                     executionId,
                     i + 1,
                     testCase.getMethod(),
-                    testCase.getEndpoint());
+                    testCase.getEndpoint(),
+                    testCase.getExpectedStatus(),
+                    testCase.getExpectedOutputJson());
 
             report.put("testCaseNo", i + 1);
             report.put("method", testCase.getMethod());
@@ -95,14 +106,22 @@ public class TestCaseHelper {
                 HttpMethod httpMethod =
                         HttpMethod.valueOf(testCase.getMethod().toString());
 
-                ResponseEntity<JsonNode> responseEntity = webClient
+                // Build request
+                WebClient.RequestBodySpec request = webClient
                         .method(httpMethod)
                         .uri(url.getUrl() + testCase.getEndpoint())
-                        .accept(MediaType.APPLICATION_JSON)
-                        .bodyValue(testCase.getInputJson())
-                        .retrieve()
-                        .toEntity(JsonNode.class)
-                        .block();
+                        .accept(MediaType.APPLICATION_JSON);
+
+                // Only attach body for non-GET methods
+                if (!httpMethod.equals(HttpMethod.GET) && testCase.getInputJson() != null) {
+                    request.bodyValue(testCase.getInputJson());
+                }
+
+                // IMPORTANT: use exchangeToMono so 4xx/5xx don't throw exception
+                ResponseEntity<JsonNode> responseEntity =
+                        request.exchangeToMono(response ->
+                                response.toEntity(JsonNode.class)
+                        ).block();
 
                 int actualStatus = responseEntity.getStatusCodeValue();
                 JsonNode actualBody = responseEntity.getBody();
@@ -110,14 +129,19 @@ public class TestCaseHelper {
                 report.put("actualStatus", actualStatus);
                 report.put("actualBody", actualBody);
 
-                log.info("ExecutionId={} | TestCase #{} | ExpectedStatus={} | ActualStatus={}",
+                log.info("ExecutionId={} | TestCase #{} | ExpectedStatus={} | ActualStatus={} | expectedBody={} | actualBody={}",
                         executionId,
                         i + 1,
                         testCase.getExpectedStatus(),
-                        actualStatus);
+                        actualStatus,
+                        testCase.getExpectedOutputJson(),
+                        actualBody);
 
-                if (actualStatus == testCase.getExpectedStatus()
-                        && Objects.equals(actualBody, testCase.getExpectedOutputJson())) {
+                // Compare JSON safely
+                boolean bodyMatch =
+                        Objects.equals(actualBody, testCase.getExpectedOutputJson());
+
+                if (actualStatus == testCase.getExpectedStatus() && bodyMatch) {
 
                     report.put("status", "PASSED");
                     isPassed = true;
@@ -141,19 +165,9 @@ public class TestCaseHelper {
                             report.get("error"));
                 }
 
-            } catch (WebClientResponseException ex) {
+            } catch (Exception ex) {
 
-                int actualStatus = ex.getStatusCode().value();
-                report.put("actualStatus", actualStatus);
-
-                try {
-                    JsonNode actualBody =
-                            new ObjectMapper().readTree(ex.getResponseBodyAsString());
-                    report.put("actualBody", actualBody);
-                } catch (Exception e) {
-                    report.put("actualBody", ex.getResponseBodyAsString());
-                }
-
+                // Real errors only (timeout, connection failure, crash)
                 report.put("status", "FAILED");
                 report.put("error", ex.getMessage());
 
@@ -163,7 +177,7 @@ public class TestCaseHelper {
                         ex.getMessage());
             }
 
-            // ⏱ Execution time log
+            // ⏱ Execution time
             long timeTaken =
                     Duration.between(startTime, Instant.now()).toMillis();
 
@@ -174,29 +188,30 @@ public class TestCaseHelper {
                     i + 1,
                     timeTaken);
 
-            // 🔥 Early exit for SUBMIT mode
-            if (!isSample && !"PASSED".equals(report.get("status"))) {
+            // Early exit for SUBMIT mode
+            if (!isSample && (!"PASSED".equals(report.get("status")) || testCases.size() == passedCount )   ) {
+                log.info("In broooooooooooooooooooooooooooooooooooooooooooo wow in submittttttttttttttttttttttttttttttttttttttttttttt");
 
+                DATA.put("TotalTestcases", testCases.size());
                 DATA.put("PassedTestcases", passedCount);
                 DATA.put("FailedAt", i + 1);
                 DATA.put("Result", report);
 
-                LogWebSocketHandler.sendEvent(
-                        executionId,
-                        "SUBMIT",
-                        new CustomResponse(
-                                DATA,
-                                "Wrong Answer",
-                                200,
-                                "Testcase " + (i + 1) + " failed"
-                        )
-                );
+                DATA.put("Status",
+                        passedCount == testCases.size()
+                                ? SubmissionStatus.ACCEPTED
+                                : SubmissionStatus.WRONG_ANSWER);
 
                 log.warn("ExecutionId={} | Submission stopped at TestCase #{}",
                         executionId,
                         i + 1);
 
-                return; // stop further execution
+                return new CustomResponse(
+                        DATA,
+                        "Wrong Answer",
+                        200,
+                        "Testcase " + (i + 1) + " failed"
+                );
             }
 
             testCaseReports.add(report);
@@ -223,6 +238,13 @@ public class TestCaseHelper {
                         "Execution finished"
                 )
         );
+
+        return new CustomResponse(
+                DATA,
+                "execution done",
+                200,
+                null
+        );
     }
 
     // ---------------------------------------------------
@@ -234,8 +256,8 @@ public class TestCaseHelper {
         testCaseChecker(testCases, url, true, executionId);
     }
 
-    public void codeSubmit(String uuid, PreviewURL url, String executionId) {
+    public CustomResponse codeSubmit(String uuid, PreviewURL url, String executionId) {
         List<TestCase> testCases = getTestCase(uuid);
-        testCaseChecker(testCases, url, false, executionId);
+        return testCaseChecker(testCases, url, false, executionId);
     }
 }

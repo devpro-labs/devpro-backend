@@ -20,9 +20,7 @@ public class Profile {
 
     @Id
     @Column
-    private UUID userId;
-
-
+    private String userId;
 
     // BASIC STATS
     @Column(name = "total_submissions")

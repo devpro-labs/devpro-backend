@@ -31,12 +31,13 @@ public class Problem {
     private String description;
 
     @Column
-    private String difficulty;
+    @Enumerated(EnumType.STRING)
+    private Difficulty difficulty;
 
     /*  runtime  */
-    @Column(nullable = false, columnDefinition = "jsonb")
-    @Type(JsonBinaryType.class)
-    private JsonNode imageName;
+//    @Column(nullable = false, columnDefinition = "jsonb")
+//    @Type(JsonBinaryType.class)
+//    private JsonNode imageName;
 
     @Column
     private List<String> tags;
