@@ -5,19 +5,16 @@ import com.devpro.code_runner_service.DTO.PreviewURL;
 import com.devpro.code_runner_service.DTO.SubmissionRequest;
 import com.devpro.code_runner_service.DTO.SubmissionStatus;
 import com.devpro.code_runner_service.clients.ProblemClient;
-import com.devpro.code_runner_service.config.LogWebSocketHandler;
+import com.devpro.code_runner_service.config.socket_configs.LogWebSocketHandler;
 import com.devpro.code_runner_service.models.Problem;
 import com.devpro.code_runner_service.models.TestCase;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -29,10 +26,12 @@ public class TestCaseHelper {
 
     private final ProblemClient problemClient;
     private final WebClient webClient;
+    private final LogWebSocketHandler logWebSocketHandler;
 
-    public TestCaseHelper(ProblemClient problemClient, WebClient webClient) {
+    public TestCaseHelper(ProblemClient problemClient, WebClient webClient, LogWebSocketHandler logWebSocketHandler) {
         this.problemClient = problemClient;
         this.webClient = webClient;
+        this.logWebSocketHandler = logWebSocketHandler;
     }
 
     private List<TestCase> getTestCase(String uuid) {
@@ -228,7 +227,7 @@ public class TestCaseHelper {
                 passedCount,
                 testCases.size() - passedCount);
 
-        LogWebSocketHandler.sendEvent(
+        logWebSocketHandler.sendEvent(
                 executionId,
                 "TESTCASE",
                 new CustomResponse(
@@ -251,13 +250,13 @@ public class TestCaseHelper {
     // PUBLIC METHODS
     // ---------------------------------------------------
 
-    public void codeRun(String uuid, PreviewURL url, String executionId) {
-        List<TestCase> testCases = getSampleTestCases(uuid);
+    public void codeRun(String problemId, PreviewURL url, String executionId) {
+        List<TestCase> testCases = getSampleTestCases(problemId);
         testCaseChecker(testCases, url, true, executionId);
     }
 
-    public CustomResponse codeSubmit(String uuid, PreviewURL url, String executionId) {
-        List<TestCase> testCases = getTestCase(uuid);
+    public CustomResponse codeSubmit(String problemId, PreviewURL url, String executionId) {
+        List<TestCase> testCases = getTestCase(problemId);
         return testCaseChecker(testCases, url, false, executionId);
     }
 }

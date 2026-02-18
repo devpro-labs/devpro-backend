@@ -100,14 +100,12 @@
 			<artifactId>spring-boot-starter-websocket</artifactId>
 		</dependency>
 
-<!--		jedis-->
-		<!-- Source: https://mvnrepository.com/artifact/redis.clients/jedis -->
+<!--		redis  -->
 		<dependency>
-			<groupId>redis.clients</groupId>
-			<artifactId>jedis</artifactId>
-			<version>7.2.1</version>
-			<scope>compile</scope>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-redis</artifactId>
 		</dependency>
+
 
 	</dependencies>
 

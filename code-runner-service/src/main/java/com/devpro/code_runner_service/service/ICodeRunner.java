@@ -5,8 +5,8 @@ import com.devpro.code_runner_service.DTO.DockerRunner;
 import jakarta.servlet.http.HttpServletRequest;
 
 public interface ICodeRunner {
-    CustomResponse runCode(String uuid, DockerRunner dockerRunner, String executionId);
-    CustomResponse submitCode(String uuid, DockerRunner dockerRunner, HttpServletRequest request);
+    CustomResponse runCode(String problemId, DockerRunner dockerRunner, String executionId);
+    CustomResponse submitCode(String problemId, DockerRunner dockerRunner, HttpServletRequest request);
 
-    void executeAsync(String executionId, String uuid, DockerRunner runner);
+    void executeAsync(String executionId, String problemId, DockerRunner runner, String userId);
 }

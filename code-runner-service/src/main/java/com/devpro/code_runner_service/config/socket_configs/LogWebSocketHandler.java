@@ -1,39 +1,41 @@
-package com.devpro.code_runner_service.config;
+package com.devpro.code_runner_service.config.socket_configs;
 
 import com.devpro.code_runner_service.DTO.CustomResponse;
 import com.devpro.code_runner_service.DTO.ExecutionEvent;
+import com.devpro.code_runner_service.DTO.SocketEvent;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
+@Slf4j
 @Component
 public class LogWebSocketHandler extends TextWebSocketHandler {
     // submissionId → session
-    private static final Map<String, WebSocketSession> sessions = new ConcurrentHashMap<>();
+    private  final Map<String, WebSocketSession> sessions = new HashMap<>();
 
     // submissionId → containerId
-    private static final Map<String, String> containers = new ConcurrentHashMap<>();
+    private  final Map<String, String> containers = new HashMap<>();
 
-    private static final Logger log =
-            LoggerFactory.getLogger(LogWebSocketHandler.class);
+    private    final RedisTemplate<String, String> redisTemplate;
 
-    private static ObjectMapper objectMapper = new ObjectMapper();
+    private  final ObjectMapper objectMapper;
 
-    private final ExecutionRegistry executionRegistry;
-
-    public LogWebSocketHandler(ExecutionRegistry executionRegistry) {
-        this.executionRegistry = executionRegistry;
+    public LogWebSocketHandler(RedisTemplate<String, String> redisTemplate, ObjectMapper objectMapper) {
+        this.redisTemplate = redisTemplate;
+        this.objectMapper = objectMapper;
     }
 
-    public static void bindSession(String submissionId, WebSocketSession session) {
+
+    public  void bindSession(String submissionId, WebSocketSession session) {
 
         if (submissionId == null || session == null) {
             return;
@@ -44,22 +46,33 @@ public class LogWebSocketHandler extends TextWebSocketHandler {
         System.out.println("SESSION BINDED: " + submissionId);
 
         // Optional: Send connected event to frontend
-        sendMessage(submissionId, "CONNECTED");
+       sendEvent(submissionId, "CONNECTED", new CustomResponse(null, "Connected", 200, "Connected"));
     }
 
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
 
-        String submissionId = extractSubmissionId(session);
-        sessions.put(submissionId, session);
+        String executionId = extractSubmissionId(session);
+        sessions.put(executionId, session);
 
-        System.out.println("WS CONNECTED: " + submissionId);
+        System.out.println("WS CONNECTED: " + executionId);
 
-        bindSession(submissionId, session);
+        bindSession(executionId, session);
 
-        // 🔥 Start execution only AFTER socket is connected
-        executionRegistry.startExecution(submissionId);
+        String eventKey = "execution:" + executionId + ":events";
+
+        List<String> pendingEvents =
+                redisTemplate.opsForList().range(eventKey, 0, -1);
+
+        if (pendingEvents != null) {
+            for (String json : pendingEvents) {
+                session.sendMessage(new TextMessage(json));
+            }
+
+            // clear after sending
+            redisTemplate.delete(eventKey);
+        }
     }
 
     @Override
@@ -90,45 +103,35 @@ public class LogWebSocketHandler extends TextWebSocketHandler {
     // Utility methods
     // -------------------------
 
-    public static WebSocketSession getSession(String submissionId) {
+    public  WebSocketSession getSession(String submissionId) {
         return sessions.get(submissionId);
     }
 
-    public static void removeSession(String executionId) {
+    public  void removeSession(String executionId) {
         sessions.remove(executionId);
     }
 
 
-    public static void bindContainer(String submissionId, String containerId) {
+    public  void bindContainer(String submissionId, String containerId) {
         containers.put(submissionId, containerId);
     }
 
-    public static void removeContainer(String executionId) {
+    public  void removeContainer(String executionId) {
         containers.remove(executionId);
     }
 
-    private static String extractSubmissionId(WebSocketSession session) {
+    private  String extractSubmissionId(WebSocketSession session) {
         String path = session.getUri().getPath();
         return path.substring(path.lastIndexOf("/") + 1);
     }
 
-    private static void killContainer(String containerId) {
+    private  void killContainer(String containerId) {
         // dockerClient.killContainerCmd(containerId).exec();
         System.out.println("KILLING CONTAINER: " + containerId);
     }
 
-    public static void sendMessage(String executionId, String message) {
 
-        WebSocketSession session = sessions.get(executionId);
-
-        if (session != null && session.isOpen()) {
-            try {
-                session.sendMessage(new TextMessage(message));
-            } catch (Exception ignored) {}
-        }
-    }
-
-    public static void sendEvent(String executionId, String type, Object data) {
+    public  void sendEvent(String executionId, String type, Object data) {
 
         WebSocketSession session = sessions.get(executionId);
 
@@ -148,29 +151,26 @@ public class LogWebSocketHandler extends TextWebSocketHandler {
             }
         } else {
             log.warn("No active session found | executionId={}", executionId);
+            //add into queue
+            try{
+                redisTemplate.opsForList()
+                        .leftPush("execution:" +executionId +":events"
+                        , objectMapper.writeValueAsString(
+                                new SocketEvent(
+                                        executionId,
+                                        type,
+                                        data
+                                )
+                        ) );
+            } catch (Exception e) {
+                log.info("error at push message{}", e.getMessage());
+            }
+
         }
     }
-
-    public static void sendData(String executionId, CustomResponse response) {
-
-        WebSocketSession session = sessions.get(executionId);
-
-        if (session != null && session.isOpen()) {
-            try {
-                session.sendMessage(new TextMessage(response.toString()));
-            } catch (Exception ignored) {}
-        }
-    }
-
-
-
-    public static void sendError(String executionId, String error) {
-        sendMessage(executionId, "ERROR: " + error);
-    }
-
     // Cleanup
 
-    public static void cleanup(String executionId) {
+    public  void cleanup(String executionId) {
         removeSession(executionId);
         removeContainer(executionId);
     }

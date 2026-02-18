@@ -1,4 +1,4 @@
-package com.devpro.code_runner_service.config;
+package com.devpro.code_runner_service.config.socket_configs;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;

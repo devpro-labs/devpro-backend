@@ -42,7 +42,8 @@ public class Config {
                                 "/healthcheck",
                                 "/actuator/**",
                                 "/api/**",
-                                "/ws/**"
+                                "/ws/**",
+                                "/test/**"
                         ).permitAll()
                         .anyExchange().authenticated()
                 )

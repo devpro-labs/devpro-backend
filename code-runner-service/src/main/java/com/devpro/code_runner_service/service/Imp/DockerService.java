@@ -4,7 +4,7 @@ import com.devpro.code_runner_service.DTO.CustomResponse;
 import com.devpro.code_runner_service.DTO.DockerRunner;
 import com.devpro.code_runner_service.DTO.FileNode;
 import com.devpro.code_runner_service.DTO.PreviewURL;
-import com.devpro.code_runner_service.config.LogWebSocketHandler;
+import com.devpro.code_runner_service.config.socket_configs.LogWebSocketHandler;
 import com.devpro.code_runner_service.helper.TestCaseHelper;
 import com.devpro.code_runner_service.models.Problem;
 import com.devpro.code_runner_service.service.IDockerRepo;
@@ -30,12 +30,14 @@ public class DockerService implements IDockerRepo {
 
     private final DockerClient dockerClient;
     private final TestCaseHelper helper;
+    private final LogWebSocketHandler logWebSocketHandler;
 
     private static final int TIME_LIMIT_SECONDS = 5; // ⏱️ change per problem
 
-    public DockerService(DockerClient dockerClient, TestCaseHelper helper) {
+    public DockerService(DockerClient dockerClient, TestCaseHelper helper, LogWebSocketHandler logWebSocketHandler) {
         this.dockerClient = dockerClient;
         this.helper = helper;
+        this.logWebSocketHandler = logWebSocketHandler;
     }
 
     private void runWithTimeLimit(String containerId, String command) throws Exception {
@@ -136,7 +138,7 @@ public class DockerService implements IDockerRepo {
                                 String log = new String(frame.getPayload(), StandardCharsets.UTF_8);
 
                                 // Always send raw logs
-                                LogWebSocketHandler.sendEvent(
+                                logWebSocketHandler.sendEvent(
                                         submissionId,
                                         "LOG",
                                         log
@@ -147,7 +149,7 @@ public class DockerService implements IDockerRepo {
 
                                     errorBuffer.append(log);
 
-                                    LogWebSocketHandler.sendEvent(
+                                    logWebSocketHandler.sendEvent(
                                             submissionId,
                                             "ERROR",
                                             log
@@ -160,20 +162,20 @@ public class DockerService implements IDockerRepo {
 
                                 // If there was collected error stack
                                 if (!errorBuffer.isEmpty()) {
-                                    LogWebSocketHandler.sendEvent(
+                                    logWebSocketHandler.sendEvent(
                                             submissionId,
                                             "ERROR",
                                             errorBuffer.toString()
                                     );
                                 }
 
-                                LogWebSocketHandler.sendEvent(
+                                logWebSocketHandler.sendEvent(
                                         submissionId,
                                         "LOG",
                                         "Container stopped"
                                 );
 
-                                LogWebSocketHandler.removeSession(submissionId);
+                                logWebSocketHandler.removeSession(submissionId);
 
                                 System.out.println(
                                         "[CONTAINER " + containerId.substring(0, 6) + "] LOG STREAM CLOSED"
@@ -183,13 +185,13 @@ public class DockerService implements IDockerRepo {
                             @Override
                             public void onError(Throwable throwable) {
 
-                                LogWebSocketHandler.sendEvent(
+                                logWebSocketHandler.sendEvent(
                                         submissionId,
                                         "ERROR",
                                         "Log stream failed: " + throwable.getMessage()
                                 );
 
-                                LogWebSocketHandler.removeSession(submissionId);
+                                logWebSocketHandler.removeSession(submissionId);
 
                                 throwable.printStackTrace();
                             }
@@ -197,7 +199,7 @@ public class DockerService implements IDockerRepo {
 
             } catch (Exception e) {
 
-                LogWebSocketHandler.sendEvent(
+                logWebSocketHandler.sendEvent(
                         submissionId,
                         "ERROR",
                         "Failed to stream logs: " + e.getMessage()
@@ -298,7 +300,7 @@ public class DockerService implements IDockerRepo {
 
         int exitCode = process.waitFor();
         if (exitCode != 0) {
-//            LogWebSocketHandler.sendEvent(previewId,"LOG","docker compose up failed");
+//            logWebSocketHandler.sendEvent(previewId,"LOG","docker compose up failed");
             throw new RuntimeException("docker compose up failed");
         }
 
@@ -527,7 +529,7 @@ public class DockerService implements IDockerRepo {
             String containerId = runCompose(projectDir, previewId);
             System.out.println("RUN COMPOSE DONE, containerId = " + containerId);
 
-            LogWebSocketHandler.bindContainer(previewId, containerId);
+            logWebSocketHandler.bindContainer(previewId, containerId);
 
             // stream logs
             streamContainerLogs(containerId, previewId);
@@ -589,7 +591,7 @@ public class DockerService implements IDockerRepo {
             }
             Thread.sleep(1000);
         }
-        LogWebSocketHandler.sendEvent("compose-preview-1","LOG","Server failed to start");
+        logWebSocketHandler.sendEvent("compose-preview-1","LOG","Server failed to start");
         throw new RuntimeException("Server failed to start");
     }
 

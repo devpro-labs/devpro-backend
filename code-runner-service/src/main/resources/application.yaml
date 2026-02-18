@@ -35,3 +35,14 @@ admin:
   service:
     key: ${ADMIN_SERVICE_KEY}
 
+#user id header
+headers:
+  user:
+    id: ${USER_ID_HEADER}
+
+#rate limiting
+limits:
+  user: ${MAX_REQUEST_PER_USER} #per minute
+  global:
+    req: ${MAX_GLOBAL_REQ}
+    time: ${GLOBAL_SEC}
