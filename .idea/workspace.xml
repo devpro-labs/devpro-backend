@@ -6,10 +6,11 @@
   <component name="ChangeListManager">
     <list default="true" id="13378497-fff7-493a-9603-1f64b1c86a6c" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-gateway/src/main/java/com/devpro/api_gateway/AuthMiddleware.java" beforeDir="false" afterPath="$PROJECT_DIR$/api-gateway/src/main/java/com/devpro/api_gateway/AuthMiddleware.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-gateway/src/main/java/com/devpro/api_gateway/Config.java" beforeDir="false" afterPath="$PROJECT_DIR$/api-gateway/src/main/java/com/devpro/api_gateway/Config.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/controller/ProblemController.java" beforeDir="false" afterPath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/controller/ProblemController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/dto/ProblemRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/dto/ProblemRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/repository/TestCaseRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/repository/TestCaseRepository.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/dto/TestCaseRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/dto/TestCaseRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/model/Problem.java" beforeDir="false" afterPath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/model/Problem.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/service/CloudinaryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/service/CloudinaryService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/service/ProblemService.java" beforeDir="false" afterPath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/service/ProblemService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/service/TestCaseService.java" beforeDir="false" afterPath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/service/TestCaseService.java" afterDir="false" />
     </list>
@@ -61,6 +62,7 @@
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
+    &quot;Docker.local-postgres.yml: Compose Deployment.executor&quot;: &quot;Run&quot;,
     &quot;HTTP Request. | Create problem (JSON + multiple compose files)#2.executor&quot;: &quot;Run&quot;,
     &quot;HTTP Request. | Create problem (JSON + multiple compose files).executor&quot;: &quot;Run&quot;,
     &quot;HTTP Request.All in .executor&quot;: &quot;Run&quot;,
@@ -102,7 +104,9 @@
         <entry key="SpringBootApplicationConfigurationType">
           <value>
             <map>
+              <entry key="CodeRunnerServiceApplication" value="STOPPED" />
               <entry key="ProblemServiceApplication" value="STOPPED" />
+              <entry key="UserServiceApplication" value="FAILED" />
               <entry key="gateway" value="STOPPED" />
             </map>
           </value>
@@ -110,7 +114,7 @@
       </map>
     </option>
   </component>
-  <component name="RunManager" selected="Spring Boot.gateway">
+  <component name="RunManager" selected="Docker.local-postgres.yml: Compose Deployment">
     <configuration name=" | Create problem (JSON + multiple compose files)" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/problem-compose-dataset/.http" executionIdentifier="Create problem (JSON + multiple compose files)" runType="Run single request">
       <method v="2" />
     </configuration>
@@ -176,7 +180,22 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration default="true" type="docker-deploy" factoryName="docker-compose.yml" temporary="true">
+      <deployment type="docker-compose.yml">
+        <settings />
+      </deployment>
+      <method v="2" />
+    </configuration>
+    <configuration name="local-postgres.yml: Compose Deployment" type="docker-deploy" factoryName="docker-compose.yml" temporary="true" server-name="Docker">
+      <deployment type="docker-compose.yml">
+        <settings>
+          <option name="sourceFilePath" value="local-postgres.yml" />
+        </settings>
+      </deployment>
+      <method v="2" />
+    </configuration>
     <list>
+      <item itemvalue="Docker.local-postgres.yml: Compose Deployment" />
       <item itemvalue="HTTP Request. | Create problem (JSON + multiple compose files)#2" />
       <item itemvalue="HTTP Request. | Create problem (JSON + multiple compose files)" />
       <item itemvalue="HTTP Request.All in " />
@@ -187,6 +206,7 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Docker.local-postgres.yml: Compose Deployment" />
         <item itemvalue="Spring Boot.CodeRunnerServiceApplication" />
         <item itemvalue="HTTP Request. | Create problem (JSON + multiple compose files)#2" />
         <item itemvalue="HTTP Request. | Create problem (JSON + multiple compose files)" />

@@ -3,13 +3,16 @@ package com.devpro.problem_service.service;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.devpro.problem_service.model.Problem;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 public class CloudinaryService {
@@ -67,4 +70,30 @@ public class CloudinaryService {
                 .resourceType("raw")
                 .generate(publicId);
     }
+
+    public void deleteAllFilesByProblem(Problem problem) {
+        try {
+
+            if (problem.getComposeFile() == null || problem.getComposeFile().isEmpty()) {
+                return;
+            }
+
+            List<String> publicIds = problem.getComposeFile()
+                    .values()
+                    .stream()
+                    .filter(Objects::nonNull)
+                    .toList();
+
+            if (!publicIds.isEmpty()) {
+                cloudinary.api().deleteResources(
+                        publicIds,
+                        ObjectUtils.asMap("resource_type", "raw")
+                );
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to delete compose files from Cloudinary", e);
+        }
+    }
+
 }

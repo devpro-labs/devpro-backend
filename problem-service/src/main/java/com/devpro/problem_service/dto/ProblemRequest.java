@@ -7,6 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+@JsonIgnoreProperties(ignoreUnknown = true)
 
 @Data
 @NoArgsConstructor
@@ -23,8 +24,6 @@ public class ProblemRequest {
     private List<ServiceType> services = new ArrayList<>();
 
     private JsonNode keys;
-
-    private JsonNode imageName;
 
     private Integer timeLimitSeconds;
     private Integer memoryLimitMB;
