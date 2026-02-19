@@ -25,7 +25,11 @@ public class Submission {
 
     // Who submitted it
     @Column(name = "user_id", nullable = false)
-    private UUID userId;
+    private String userId;
+
+    //which framework
+    @Column(name = "framework")
+    private String framework;
 
     // How many test cases passed
     @Column(name = "testcases_passed")

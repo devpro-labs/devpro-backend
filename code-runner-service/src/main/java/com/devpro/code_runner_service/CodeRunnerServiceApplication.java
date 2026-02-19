@@ -3,10 +3,15 @@ package com.devpro.code_runner_service;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.data.redis.core.RedisKeyValueAdapter;
+import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 
 @SpringBootApplication
 @EnableFeignClients
+@EnableAsync
+@EnableRedisRepositories(enableKeyspaceEvents = RedisKeyValueAdapter.EnableKeyspaceEvents.ON_STARTUP)
 public class CodeRunnerServiceApplication {
 
     public static void main(String[] args) {

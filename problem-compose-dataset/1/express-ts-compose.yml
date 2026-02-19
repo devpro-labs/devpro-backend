@@ -1,13 +1,11 @@
 version: "3.8"
 
 services:
-  base:
-    image: express-js-base:latest
-    restart: unless-stopped
-
-  auth:
-    image: express-js-auth:latest
+  express:
+    image: express-js
     ports:
       - "3000"
     restart: unless-stopped
+    volumes:
+      - ${PROJECT_PATH}:/app/src
 

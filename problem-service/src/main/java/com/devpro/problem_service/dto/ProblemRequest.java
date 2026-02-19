@@ -1,5 +1,6 @@
 package com.devpro.problem_service.dto;
 
+import com.devpro.problem_service.model.Difficulty;
 import com.devpro.problem_service.model.ServiceType;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.*;
@@ -18,7 +19,7 @@ public class ProblemRequest {
 
     private String title;
     private String description;
-    private String difficulty;
+    private Difficulty difficulty;
     private List<String> tags = new ArrayList<>();
     private String entryFile;
     private List<ServiceType> services = new ArrayList<>();

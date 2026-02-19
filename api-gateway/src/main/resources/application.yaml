@@ -22,7 +22,7 @@ spring:
           uri:
             lb://problem-service
           predicates:
-            - Path=/api/problems/**
+            - Path=/api/problems/**, /api/submissions/**
         - id: user-service
           uri:
             lb://user-service
@@ -32,7 +32,7 @@ spring:
           uri:
             lb://code-runner-service
           predicates:
-            - Path=/api/code-runner/**
+            - Path=/api/code-runner/**,  /test/**
 
 
     #consul client
