@@ -175,8 +175,14 @@ public class UserService {
             // Always increment submission count
             profile.setTotalSubmissions(profile.getTotalSubmissions() + 1);
 
+            // HEATMAP (YEARLY ACTIVITY)
+            LocalDate today = LocalDate.now();
+            String fullDate = today.toString(); // 2026-02-14 format
+
+            profile.getYearlyActivity().merge(fullDate, 1, Integer::sum);
+
             // If Accepted → Update Stats
-            if (submission.getStatus() == SubmissionStatus.ACCEPTED) {
+            if (!request.isAlreadyDone() && submission.getStatus() == SubmissionStatus.ACCEPTED) {
 
                 // BASIC SOLVED STATS
                 profile.setTotalSolved(profile.getTotalSolved() + 1);
@@ -212,39 +218,32 @@ public class UserService {
                 );
 
 
-
                 // update max streak
                 profile.setMaxStreak(
                         Math.max(profile.getMaxStreak(), profile.getCurrentStreak())
                 );
 
-                // update last submission time
-                profile.setLastSubmissionAt(Instant.now());
-            }
+                // STREAK LOGIC
+                Instant lastSubmission = profile.getLastSubmissionAt();
 
-            // HEATMAP (YEARLY ACTIVITY)
-            LocalDate today = LocalDate.now();
-            String fullDate = today.toString(); // 2026-02-14 format
+                if (lastSubmission != null) {
+                    LocalDate lastDate = LocalDate.ofInstant(lastSubmission, ZoneId.systemDefault());
 
-            profile.getYearlyActivity().merge(fullDate, 1, Integer::sum);
-
-            // STREAK LOGIC
-            Instant lastSubmission = profile.getLastSubmissionAt();
-
-            if (lastSubmission != null) {
-                LocalDate lastDate = LocalDate.ofInstant(lastSubmission, ZoneId.systemDefault());
-
-                if (lastDate.equals(today.minusDays(1))) {
-                    // consecutive day
-                    profile.setCurrentStreak(profile.getCurrentStreak() + 1);
-                } else if (!lastDate.equals(today)) {
-                    // reset streak
+                    if (lastDate.equals(today.minusDays(1))) {
+                        // consecutive day
+                        profile.setCurrentStreak(profile.getCurrentStreak() + 1);
+                    } else if (!lastDate.equals(today)) {
+                        // reset streak
+                        profile.setCurrentStreak(1);
+                    }
+                } else {
+                    // first submission
                     profile.setCurrentStreak(1);
                 }
-            } else {
-                // first submission
-                profile.setCurrentStreak(1);
             }
+
+            // update last submission time
+            profile.setLastSubmissionAt(Instant.now());
 
             log.info("Profile Updated Successfully {}", profile.toString());
 
@@ -260,22 +259,22 @@ public class UserService {
         }
     }
 
-    public Response getProfile(String userName){
-        try{
+    public Response getProfile(String userName) {
+        try {
             User user = userRepository.findByUsername(userName).orElse(null);
-            if (user == null){
+            if (user == null) {
                 return new Response(null, "User not found", 404, "User not found");
             }
             Profile profile = profileRepository.findByUserId(user.getId()).orElse(null);
 
-            if(profile == null){
+            if (profile == null) {
                 return new Response(null, "Profile not found", 404, "Profile not found");
             }
 
             return new Response(Map.of("profile", profile, "user", user), "Profile fetched", 200, null);
 
         } catch (Exception e) {
-            return  new Response(null, e.getMessage(), 500, e.getMessage());
+            return new Response(null, e.getMessage(), 500, e.getMessage());
         }
     }
 

@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   express:
-    image: express-js
+    image: express-ts
     ports:
       - "3000"
     restart: unless-stopped
@@ -12,7 +12,6 @@ services:
       - PORT=3000
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - REDIS_PASSWORD=redispassword
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
       - POSTGRES_USER=user
@@ -21,7 +20,7 @@ services:
       - CACHE_TTL_SECONDS=60
     depends_on:
       redis:
-        condition: service_healthy
+        condition: service_started
       postgres:
         condition: service_healthy
     networks:
@@ -30,14 +29,8 @@ services:
   redis:
     image: redis-common
     restart: unless-stopped
-    command: [ "redis-server", "--requirepass", "redispassword" ]
     networks:
       - app-network
-    healthcheck:
-      test: [ "CMD", "redis-cli", "-a", "redispassword", "ping" ]
-      interval: 5s
-      timeout: 3s
-      retries: 10
 
   postgres:
     image: postgres-common
@@ -49,10 +42,7 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U user -d db"]
-      interval: 5s
-      timeout: 3s
-      retries: 10
+      test: [ "CMD-SHELL", "pg_isready -U user" ]
 
 networks:
   app-network:

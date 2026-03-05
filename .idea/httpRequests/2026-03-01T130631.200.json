@@ -1,0 +1,45 @@
+{
+  "DATA": {
+    "problem": {
+      "id": "284da9d0-48ca-413e-99e6-f495be39b621",
+      "title": "Basic REST API with Redis Cache and PostgreSQL",
+      "description": "Build a REST API using PostgreSQL as the primary database and Redis as a caching layer. Create a GET /users/:id endpoint that first checks Redis cache. If data exists in Redis, return it. Otherwise fetch from PostgreSQL, store it in Redis with TTL of 60 seconds, and return the result. Also implement a health check endpoint GET /health.",
+      "difficulty": "ENGINEER",
+      "tags": [
+        "redis",
+        "postgres",
+        "backend",
+        "caching",
+        "database"
+      ],
+      "entryFile": "index",
+      "services": [
+        "REST",
+        "REDIS",
+        "POSTGRES"
+      ],
+      "composeFile": {
+        "ts-express": "devpro-dev/ehwbxc3wswtis43ndidk",
+        "js-express": "devpro-dev/z79layuepccedfm4yox4"
+      },
+      "keys": {
+        "PORT": 3000,
+        "REDIS_HOST": "redis",
+        "REDIS_PORT": 6379,
+        "POSTGRES_HOST": "postgres",
+        "POSTGRES_PORT": 5432,
+        "POSTGRES_USER": "appuser",
+        "POSTGRES_PASSWORD": "apppassword",
+        "POSTGRES_DB": "appdb"
+      },
+      "timeLimitSeconds": 5,
+      "memoryLimitMB": 512,
+      "cpuLimit": 1.0,
+      "isActive": true,
+      "createdAt": "2026-03-01T07:36:26.144045500Z"
+    }
+  },
+  "MESSAGE": "Successfully created problem",
+  "STATUS": 201,
+  "ERROR": ""
+}

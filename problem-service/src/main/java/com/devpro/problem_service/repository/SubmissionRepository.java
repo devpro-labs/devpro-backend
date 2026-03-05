@@ -12,4 +12,5 @@ import java.util.UUID;
 @Repository
 public interface SubmissionRepository extends JpaRepository<Submission, UUID> {
     List<Submission> findAllByUserIdAndProblemId(String userid, UUID problemId);
+    Boolean existsByUserIdAndProblemId(String userid, UUID problemId);
 }

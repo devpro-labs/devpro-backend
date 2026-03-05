@@ -102,7 +102,7 @@ public class CodeRunnerService implements ICodeRunner {
 
                 //remove container and volume
                 dockerService.deleteContainer(
-                        oldContainer.getContainerId(),
+                        oldContainer.getProjectId(),
                         oldContainer.getFileId(),
                         oldContainer.getFileName()
                 );
@@ -121,7 +121,7 @@ public class CodeRunnerService implements ICodeRunner {
                     dockerService.getPreviewURL(dockerRunner, problem, executionId);
 
             Map<String, Object> data = response.getData();
-            String containerId = data.get("containerId").toString();
+            String projectId = data.get("projectId").toString();
             String fileId = data.get("fileId").toString();
             String fileName = data.get("fileName").toString();
             PreviewURL url = (PreviewURL) data.get("url");
@@ -135,7 +135,7 @@ public class CodeRunnerService implements ICodeRunner {
 
 
             //prepare meta data
-            ContainerDTO containerDTO = new ContainerDTO(containerId, fileId, fileName);
+            ContainerDTO containerDTO = new ContainerDTO(projectId, fileId, fileName);
             String json = objectMapper.writeValueAsString(containerDTO);
 
             // Store metadata

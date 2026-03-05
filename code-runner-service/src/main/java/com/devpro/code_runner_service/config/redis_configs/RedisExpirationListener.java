@@ -4,11 +4,13 @@ import com.devpro.code_runner_service.DTO.ContainerDTO;
 import com.devpro.code_runner_service.service.Imp.DockerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RedisExpirationListener implements MessageListener {
@@ -41,13 +43,15 @@ public class RedisExpirationListener implements MessageListener {
                 return;
             }
 
+            log.info("Deleting container: {}", json);
+
             //get dto data
             ContainerDTO containerDTO =
                     objectMapper.readValue(json, ContainerDTO.class);
 
             //delete container
             dockerService.deleteContainer(
-                    containerDTO.getContainerId(),
+                    containerDTO.getProjectId(),
                     containerDTO.getFileId(),
                     containerDTO.getFileName()
             );

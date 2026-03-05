@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ContainerDTO {
-    String containerId;
+    String projectId;
     String fileId;
     String fileName;
 }

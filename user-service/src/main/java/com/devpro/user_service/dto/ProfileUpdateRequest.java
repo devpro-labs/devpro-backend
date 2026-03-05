@@ -8,4 +8,5 @@ import lombok.*;
 public class ProfileUpdateRequest {
     Submission submission;
     Problem problem;
+    boolean isAlreadyDone;
 }

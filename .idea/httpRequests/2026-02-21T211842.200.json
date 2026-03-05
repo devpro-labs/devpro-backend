@@ -1,0 +1,39 @@
+{
+  "DATA": {
+    "problem": {
+      "id": "b6d77421-4602-4dd8-8bc3-2de6f1a139a9",
+      "title": "Redis-Based API Rate Limiter",
+      "description": "Build a REST API with Redis-based rate limiting middleware. Each user (identified by IP or userId header) can make a maximum of 5 requests per 60 seconds. If the limit is exceeded, return HTTP 429 with an appropriate error message. Use Redis to track request counts with expiry (TTL). Do NOT use in-memory counters.",
+      "difficulty": "ENGINEER",
+      "tags": [
+        "redis",
+        "rate-limiting",
+        "backend",
+        "middleware"
+      ],
+      "entryFile": "index",
+      "services": [
+        "REST",
+        "REDIS"
+      ],
+      "composeFile": {
+        "js-express": "devpro-dev/yoylyzjfk0xm2anbawan"
+      },
+      "keys": {
+        "PORT": 3000,
+        "REDIS_HOST": "redis",
+        "REDIS_PORT": 6379,
+        "RATE_LIMIT": 5,
+        "WINDOW_SECONDS": 60
+      },
+      "timeLimitSeconds": 5,
+      "memoryLimitMB": 512,
+      "cpuLimit": 1.0,
+      "isActive": true,
+      "createdAt": "2026-02-21T15:48:38.841574700Z"
+    }
+  },
+  "MESSAGE": "Successfully created problem",
+  "STATUS": 201,
+  "ERROR": ""
+}

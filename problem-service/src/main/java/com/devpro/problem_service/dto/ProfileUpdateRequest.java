@@ -16,4 +16,5 @@ import java.util.UUID;
 public class ProfileUpdateRequest {
     Submission submission;
     Problem problem;
+    boolean isAlreadyDone;
 }

@@ -59,8 +59,12 @@ public class SubmissionService {
             //submission add
             submissionRepository.save(submission);
 
+
+            //check problem is already done or not
+            boolean isAlreadyDone = submissionRepository.existsByUserIdAndProblemId(api.getUserId(), api.getProblemId());
+
             //call user's api update that
-            ProfileUpdateRequest request = new ProfileUpdateRequest(submission, problem);
+            ProfileUpdateRequest request = new ProfileUpdateRequest(submission, problem, isAlreadyDone);
             log.info("profile updated api called");
             CustomResponse response = helper.profileUpdate(request);
 

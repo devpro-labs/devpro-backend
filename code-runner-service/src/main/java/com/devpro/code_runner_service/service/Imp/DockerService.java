@@ -548,7 +548,7 @@ public class DockerService implements IDockerRepo {
             );
 
             Map<String, Object> data = new HashMap<>();
-            data.put("previewId", previewId);
+            data.put("projectId","preview-" + previewId);
             data.put("url", url);
             data.put("containerId", containerId);
             data.put("fileId", previewId);
@@ -633,10 +633,19 @@ public class DockerService implements IDockerRepo {
     }
 
     @Override
-    public CustomResponse deleteContainer(String containerId, String fileId, String fileName) {
+    public CustomResponse deleteContainer(String projectId, String fileId, String fileName) {
         try {
-            dockerClient.removeContainerCmd(containerId)
-                    .withForce(true).exec();
+            log.info("Deleting container for fileId: {}", fileId);
+            log.info("Project ID: {}", projectId);
+            ProcessBuilder builder = new ProcessBuilder(
+                    "docker", "compose",
+                    "-p", projectId,
+                    "down",
+                    "-v"
+            );
+
+            builder.start().waitFor();
+            log.info("Container deleted successfully");
 
             Path workdir = Paths.get(
                     new File(".").getCanonicalPath(),
@@ -652,6 +661,7 @@ public class DockerService implements IDockerRepo {
                         } catch (Exception ignored) {
                         }
                     });
+            log.info("Deleted workdir: {}", workdir);
 
             return new CustomResponse(
                     Map.of("message", "Deleted successfully"),
