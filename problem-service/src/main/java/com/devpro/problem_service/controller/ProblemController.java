@@ -93,4 +93,37 @@ public class ProblemController {
                 .badRequest()
                 .body("Request must be multipart/form-data");
     }
+
+    // UPDATE
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<CustomResponse> update(
+            @PathVariable UUID id,
+            @RequestPart("problem") String problemJson,
+            @RequestPart(value = "composeFiles", required = false) List<MultipartFile> composeFiles
+    ) throws Exception {
+
+        ObjectMapper mapper = new ObjectMapper();
+        ProblemRequest problem = mapper.readValue(problemJson, ProblemRequest.class);
+
+//        System.out.println("---- DEBUG START ----");
+//        System.out.println("ProblemRequest: " +problem);
+//        if (composeFiles == null) {
+//            System.out.println("composeFiles is NULL");
+//        } else {
+//            System.out.println("composeFiles size: " + composeFiles.size());
+
+            for (MultipartFile file : composeFiles) {
+                System.out.println("File name: " + file.getOriginalFilename());
+                System.out.println("File size: " + file.getSize());
+                System.out.println("Is empty: " + file.isEmpty());
+            }
+//        }
+
+//        System.out.println("---- DEBUG END ----");
+
+        CustomResponse response = service.update(id, problem, composeFiles);
+
+        return ResponseEntity.ok(response);
+    }
+
 }

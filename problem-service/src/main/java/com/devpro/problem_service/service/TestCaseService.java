@@ -46,8 +46,17 @@ public class TestCaseService {
         tc.setMethod(request.getMethod());
 
 
-        tc.setInputJson(objectMapper.readTree(request.getInput().toString()));
-        tc.setExpectedOutputJson(objectMapper.readTree(request.getExpectedOutput().toString()));
+        tc.setInputJson(
+                request.getInput() != null
+                        ? request.getInput()
+                        : objectMapper.createObjectNode()
+        );
+
+        tc.setExpectedOutputJson(
+                request.getExpectedOutput() != null
+                        ? request.getExpectedOutput()
+                        : objectMapper.createObjectNode()
+        );
 
 
         TestCase saved = repository.save(tc);
@@ -71,6 +80,10 @@ public class TestCaseService {
                 200,
                 ""
         );
+    }
+
+    public List<TestCase> getTestcaseByProblem(UUID problemId) {
+        return repository.findByProblemId(problemId);
     }
 
     public CustomResponse getByProblem(UUID problemId) {
@@ -133,12 +146,20 @@ public class TestCaseService {
 
 
     private double calculateSize(TestCaseRequest r) {
-        double bytes =
-                r.getInput().toString().getBytes(StandardCharsets.UTF_8).length +
-                        r.getExpectedOutput().toString().getBytes(StandardCharsets.UTF_8).length;
 
-        return Math.round(bytes / 1024);
+        byte[] inputBytes = r.getInput() != null
+                ? r.getInput().toString().getBytes(StandardCharsets.UTF_8)
+                : new byte[0];
+
+        byte[] outputBytes = r.getExpectedOutput() != null
+                ? r.getExpectedOutput().toString().getBytes(StandardCharsets.UTF_8)
+                : new byte[0];
+
+        double totalBytes = inputBytes.length + outputBytes.length;
+
+        return Math.round(totalBytes / 1024.0);
     }
+
 
 
     // ================= SAMPLE =================
