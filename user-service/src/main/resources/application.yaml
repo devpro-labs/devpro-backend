@@ -30,7 +30,7 @@ spring:
         register: true
         instance-id: ${spring.application.name}-${server.port}
         prefer-ip-address: true
-      host: localhost
+      host: ${CONSUL_HOST:localhost}
       port: 8500
 
 server:

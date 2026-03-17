@@ -1,0 +1,128 @@
+version: "3.8"
+
+services:
+
+  consul:
+    image: hashicorp/consul
+    ports:
+      - "8500:8500"
+    command: agent -dev -client=0.0.0.0
+    healthcheck:
+      test: ["CMD", "consul", "info"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - devpro-network
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres-devpro
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - devpro-network
+
+  adminer:
+    image: adminer:latest
+    container_name: adminer-devpro
+    restart: always
+    ports:
+      - "5433:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+        - devpro-network
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: devpro-redis
+    ports:
+      - "6379:6379"
+    command: >
+      redis-server
+      --notify-keyspace-events Ex
+      --appendonly yes
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a",  "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - devpro-network
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: devpro-api-gateway
+    ports:
+      - "9000:9000"
+    env_file:
+      - .env
+    depends_on:
+      consul:
+        condition: service_healthy
+    networks:
+      - devpro-network
+
+  user-service:
+    build: ./user-service
+    container_name: devpro-user-service
+    ports:
+      - "8081:8081"
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      consul:
+        condition: service_healthy
+    networks:
+      - devpro-network
+#
+  problem-service:
+    build: ./problem-service
+    container_name: devpro-problem-service
+    ports:
+      - "8082:8082"
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      consul:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - devpro-network
+#
+  code-runner-service:
+    build: ./code-runner-service
+    container_name: devpro-code-runner
+    ports:
+      - "8083:8083"
+    env_file:
+      - .env
+    depends_on:
+      redis:
+        condition: service_healthy
+      consul:
+        condition: service_healthy
+    networks:
+      - devpro-network
+
+#
+networks:
+  devpro-network:
+    driver: bridge

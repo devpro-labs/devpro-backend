@@ -5,13 +5,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="13378497-fff7-493a-9603-1f64b1c86a6c" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/indexLayout.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/projectSettingsUpdater.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/api-gateway/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/code-runner-service/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/problem-service/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/user-service/Dockerfile" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/controller/ProblemController.java" beforeDir="false" afterPath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/controller/ProblemController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/dto/TestCaseRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/dto/TestCaseRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/model/Problem.java" beforeDir="false" afterPath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/model/Problem.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/service/CloudinaryService.java" beforeDir="false" afterPath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/service/CloudinaryService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/service/ProblemService.java" beforeDir="false" afterPath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/service/ProblemService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/service/TestCaseService.java" beforeDir="false" afterPath="$PROJECT_DIR$/problem-service/src/main/java/com/devpro/problem_service/service/TestCaseService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api-gateway/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/api-gateway/src/main/resources/application.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/api-gateway/src/test/java/com/devpro/api_gateway/ApiGatewayApplicationTests.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/code-runner-service/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/code-runner-service/src/main/resources/application.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/problem-service/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/problem-service/src/main/resources/application.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/resources/application.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/user-service/src/test/java/com/devpro/user_service/UserServiceApplicationTests.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,8 +58,8 @@
         }</component>
   <component name="KubernetesApiPersistence">{}</component>
   <component name="KubernetesApiProvider">{
-        &quot;isMigrated&quot;: true
-        }</component>
+  &quot;isMigrated&quot;: true
+}</component>
   <component name="ProjectColorInfo">{
         &quot;customColor&quot;: &quot;&quot;,
         &quot;associatedIndex&quot;: 7
@@ -64,38 +72,39 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "HTTP Request. | Create problem (JSON + multiple compose files)#2.executor": "Run",
-    "HTTP Request. | Create problem (JSON + multiple compose files).executor": "Run",
-    "HTTP Request.3 | Create problem (JSON + multiple compose files).executor": "Run",
-    "HTTP Request.4 | #1.executor": "Run",
-    "HTTP Request.All in .executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "Spring Boot.CodeRunnerServiceApplication.executor": "Run",
-    "Spring Boot.ProblemServiceApplication.executor": "Run",
-    "Spring Boot.UserServiceApplication.executor": "Run",
-    "Spring Boot.gateway.executor": "Run",
-    "git-widget-placeholder": "Merging main",
-    "junie.onboarding.icon.badge.shown": "true",
-    "kotlin-language-version-configured": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "run.configurations.included.in.services": "true",
-    "service.view.auto.scroll.to.source": "true",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;HTTP Request. | Create problem (JSON + multiple compose files)#2.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request. | Create problem (JSON + multiple compose files).executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request.3 | Create problem (JSON + multiple compose files).executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request.4 | #1.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request.All in .executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;Spring Boot.CodeRunnerServiceApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.ProblemServiceApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.UserServiceApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.gateway.executor&quot;: &quot;Run&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;run.configurations.included.in.services&quot;: &quot;true&quot;,
+    &quot;service.view.auto.scroll.to.source&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunDashboard">
     <option name="configurationTypes">
       <set>
@@ -200,7 +209,6 @@
         <item itemvalue="HTTP Request.4 | #1" />
         <item itemvalue="HTTP Request.3 | Create problem (JSON + multiple compose files)" />
         <item itemvalue="HTTP Request.All in " />
-        <item itemvalue="Spring Boot.CodeRunnerServiceApplication" />
         <item itemvalue="HTTP Request. | Create problem (JSON + multiple compose files)#2" />
       </list>
     </recent_temporary>
@@ -236,10 +244,20 @@
       <workItem from="1771656042718" duration="7580000" />
       <workItem from="1772349454771" duration="2113000" />
       <workItem from="1772729256742" duration="8898000" />
+      <workItem from="1772784020998" duration="2500000" />
+      <workItem from="1773391659165" duration="1714000" />
+      <workItem from="1773393419967" duration="1925000" />
+      <workItem from="1773395509636" duration="2734000" />
+      <workItem from="1773401751470" duration="617000" />
+      <workItem from="1773772979909" duration="1540000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
+  <component name="VcsManagerConfiguration">
+    <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
   </component>
 </project>
