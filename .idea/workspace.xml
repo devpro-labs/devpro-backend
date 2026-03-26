@@ -5,21 +5,24 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="13378497-fff7-493a-9603-1f64b1c86a6c" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/indexLayout.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/projectSettingsUpdater.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/api-gateway/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/code-runner-service/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/problem-service/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/user-service/Dockerfile" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test.yml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/tmp-dataset/problem-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/httpRequests/http-requests-log.http" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/httpRequests/http-requests-log.http" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/api-gateway/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/api-gateway/src/main/resources/application.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/api-gateway/src/test/java/com/devpro/api_gateway/ApiGatewayApplicationTests.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/code-runner-service/src/main/java/com/devpro/code_runner_service/service/Imp/DockerService.java" beforeDir="false" afterPath="$PROJECT_DIR$/code-runner-service/src/main/java/com/devpro/code_runner_service/service/Imp/DockerService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/code-runner-service/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/code-runner-service/src/main/resources/application.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/problem-service/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/problem-service/src/main/resources/application.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/main/resources/application.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/user-service/src/main/resources/application.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/user-service/src/test/java/com/devpro/user_service/UserServiceApplicationTests.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/local-services.yml" beforeDir="false" afterPath="$PROJECT_DIR$/local-services.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/problem-compose-dataset/.http" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/problem-compose-dataset/1/express-js-compose.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/problem-compose-dataset/1/express-ts-compose.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/problem-compose-dataset/1/fastapi-py-compose.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/problem-compose-dataset/2/express-js-compose.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/problem-compose-dataset/2/express-ts-compose.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/problem-compose-dataset/2/fastapi-py.yml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/problem-compose-dataset/3.http" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/problem-compose-dataset/4.http" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -76,6 +79,7 @@
   &quot;keyToString&quot;: {
     &quot;HTTP Request. | Create problem (JSON + multiple compose files)#2.executor&quot;: &quot;Run&quot;,
     &quot;HTTP Request. | Create problem (JSON + multiple compose files).executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request.1 | #1.executor&quot;: &quot;Run&quot;,
     &quot;HTTP Request.3 | Create problem (JSON + multiple compose files).executor&quot;: &quot;Run&quot;,
     &quot;HTTP Request.4 | #1.executor&quot;: &quot;Run&quot;,
     &quot;HTTP Request.All in .executor&quot;: &quot;Run&quot;,
@@ -105,6 +109,11 @@
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
 }</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\DevPro-lab\devpro-backend\tmp-dataset" />
+    </key>
+  </component>
   <component name="RunDashboard">
     <option name="configurationTypes">
       <set>
@@ -115,11 +124,11 @@
       </set>
     </option>
   </component>
-  <component name="RunManager" selected="HTTP Request.4 | #1">
-    <configuration name=" | Create problem (JSON + multiple compose files)" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/problem-compose-dataset/.http" executionIdentifier="Create problem (JSON + multiple compose files)" runType="Run single request">
+  <component name="RunManager" selected="HTTP Request.1 | #1">
+    <configuration name=" | Create problem (JSON + multiple compose files)#2" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/problem-compose-dataset/.http" executionIdentifier="Create problem (JSON + multiple compose files)#2" index="2" runType="Run single request">
       <method v="2" />
     </configuration>
-    <configuration name=" | Create problem (JSON + multiple compose files)#2" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/problem-compose-dataset/.http" executionIdentifier="Create problem (JSON + multiple compose files)#2" index="2" runType="Run single request">
+    <configuration name="1 | #1" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/tmp-dataset/1.http" executionIdentifier="#1" runType="Run single request">
       <method v="2" />
     </configuration>
     <configuration name="3 | Create problem (JSON + multiple compose files)" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/problem-compose-dataset/3.http" executionIdentifier="Create problem (JSON + multiple compose files)" runType="Run single request">
@@ -194,10 +203,10 @@
       </method>
     </configuration>
     <list>
+      <item itemvalue="HTTP Request.1 | #1" />
       <item itemvalue="HTTP Request.4 | #1" />
       <item itemvalue="HTTP Request.3 | Create problem (JSON + multiple compose files)" />
       <item itemvalue="HTTP Request. | Create problem (JSON + multiple compose files)#2" />
-      <item itemvalue="HTTP Request. | Create problem (JSON + multiple compose files)" />
       <item itemvalue="HTTP Request.All in " />
       <item itemvalue="Spring Boot.CodeRunnerServiceApplication" />
       <item itemvalue="Spring Boot.ProblemServiceApplication" />
@@ -206,6 +215,7 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="HTTP Request.1 | #1" />
         <item itemvalue="HTTP Request.4 | #1" />
         <item itemvalue="HTTP Request.3 | Create problem (JSON + multiple compose files)" />
         <item itemvalue="HTTP Request.All in " />
@@ -249,7 +259,11 @@
       <workItem from="1773393419967" duration="1925000" />
       <workItem from="1773395509636" duration="2734000" />
       <workItem from="1773401751470" duration="617000" />
-      <workItem from="1773772979909" duration="1540000" />
+      <workItem from="1773772979909" duration="1836000" />
+      <workItem from="1773826563265" duration="1210000" />
+      <workItem from="1774446216217" duration="11666000" />
+      <workItem from="1774501571832" duration="17537000" />
+      <workItem from="1774533027805" duration="11376000" />
     </task>
     <servers />
   </component>

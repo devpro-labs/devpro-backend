@@ -38,7 +38,7 @@ spring:
     #consul client
     consul:
       port: 8500
-      host: consul
+      host: ${CONSUL_HOST:localhost}
       discovery:
         instance-id: ${spring.application.name}-${server.port}
         register: true

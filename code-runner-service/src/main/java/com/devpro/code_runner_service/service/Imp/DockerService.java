@@ -7,22 +7,23 @@ import com.devpro.code_runner_service.DTO.PreviewURL;
 import com.devpro.code_runner_service.config.socket_configs.LogWebSocketHandler;
 import com.devpro.code_runner_service.helper.TestCaseHelper;
 import com.devpro.code_runner_service.models.Problem;
+import com.devpro.code_runner_service.models.ServiceType;
 import com.devpro.code_runner_service.service.IDockerRepo;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.async.ResultCallback;
+import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.model.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.net.HttpURLConnection;
-import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
 import java.util.concurrent.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -31,6 +32,15 @@ public class DockerService implements IDockerRepo {
     private final DockerClient dockerClient;
     private final TestCaseHelper helper;
     private final LogWebSocketHandler logWebSocketHandler;
+
+    @Value("${traefik.domain}")
+    private String domain;
+
+    @Value("${traefik.network}")
+    private String network;
+
+    @Value("${traefik.protocol}")
+    private String protocol;
 
     private static final int TIME_LIMIT_SECONDS = 5; // ⏱️ change per problem
 
@@ -97,29 +107,8 @@ public class DockerService implements IDockerRepo {
         }
     }
 
-    private void logFileTree(List<FileNode> files, String indent) {
-        if (files == null) {
-            System.out.println(indent + "❌ files = null");
-            return;
-        }
-
-        for (FileNode file : files) {
-            if (file.isFolder()) {
-                System.out.println(indent + "📁 " + file.getName());
-                logFileTree(file.getChildren(), indent + "  ");
-            } else {
-                System.out.println(
-                        indent + "📄 " + file.getName() +
-                                " (content length: " +
-                                (file.getContent() == null ? 0 : file.getContent().length()) + ")"
-                );
-            }
-        }
-    }
-
     private void streamContainerLogs(String containerId, String submissionId) {
-        log.info("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS" +
-                " Starting log stream for container inside {}", containerId);
+
         new Thread(() -> {
             try {
 
@@ -211,362 +200,107 @@ public class DockerService implements IDockerRepo {
     }
 
 
-    /**
-     * get public url
-     * download it and get content
-     */
-    private String getYMLContent(String publicId) {
+    private void execPostgres(String sql) throws Exception {
+
         try {
+            ProcessBuilder pb = new ProcessBuilder(
+                    "docker", "exec", "-i", "problem-postgres",
+                    "psql", "-U", "user",
+                    "-d", "db",
+                    "-c", sql
+            );
 
-            //get url
-            String url = helper.getPublicUrl(publicId);
+            Process process = pb.start();
 
-            //download it
-            URI uri = URI.create(url);
-
-            try (BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(uri.toURL().openStream(), StandardCharsets.UTF_8))) {
-
-                return reader.lines().collect(Collectors.joining("\n"));
-            }
-
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * write a compose file
-     */
-    private void writeComposeFile(
-            Map<String, String> composeFile,
-            Path projectRoot
-    ) throws IOException {
-
-        for (Map.Entry<String, String> entry : composeFile.entrySet()) {
-            String fileName = entry.getKey();      // docker-compose.yml
-            String publicId = entry.getValue();    // cloudinary id
-
-            String content = getYMLContent(publicId);
-
-            Path filePath = projectRoot.resolve(fileName);
-            Files.writeString(filePath, content, StandardCharsets.UTF_8);
-        }
-    }
-
-    private String getFirstRunningContainer(File projectDir) throws Exception {
-
-        ProcessBuilder pb = new ProcessBuilder(
-                "docker", "compose", "ps", "-q"
-        );
-        String path = projectDir.getAbsolutePath().replace("\\", "/");
-        pb.environment().put("PROJECT_PATH", path);
-
-        pb.directory(projectDir);
-
-        Process process = pb.start();
-
-        try (BufferedReader reader =
-                     new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-
-            String containerId = reader.readLine();
-
-            if (containerId == null || containerId.isBlank()) {
-                throw new RuntimeException("No running containers found");
-            }
-
-            return containerId.trim();
-        }
-    }
-
-
-    // 🔹 docker compose up
-    private String runCompose(File projectDir, String previewId) throws Exception {
-
-        //1. run compose file
-        ProcessBuilder pb = new ProcessBuilder(
-                "docker", "compose", "up", "-d"
-        );
-        pb.directory(projectDir);
-        pb.environment().put("PROJECT_PATH", projectDir.getAbsolutePath());
-        pb.redirectErrorStream(true);
-
-        Process process = pb.start();
-
-        try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(process.getInputStream()))) {
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(process.getInputStream())
+            );
             reader.lines().forEach(System.out::println);
-        }
 
-        int exitCode = process.waitFor();
-        if (exitCode != 0) {
-//            logWebSocketHandler.sendEvent(previewId,"LOG","docker compose up failed");
-            throw new RuntimeException("docker compose up failed");
-        }
-
-        // 2. fetch container ID for service
-        return getFirstRunningContainer(projectDir);
-
-    }
-
-    /**
-     * export ports
-     */
-    private int getComposePort(String containerId) throws Exception {
-        ProcessBuilder pb = new ProcessBuilder(
-                "docker", "port", containerId, String.valueOf(3000)
-        );
-        pb.redirectErrorStream(true);
-
-        Process process = pb.start();
-
-        try (BufferedReader reader =
-                     new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-
-            String line = reader.readLine(); // 0.0.0.0:32768
-            System.out.println(line);
-            if (line == null || !line.contains(":")) {
-                throw new RuntimeException("Unable to detect exposed port");
-            }
-            return Integer.parseInt(line.split(":")[1]);
-        }
-    }
-
-
-    private List<String> getRunningContainers(File projectDir) throws Exception {
-        ProcessBuilder pb = new ProcessBuilder(
-                "docker", "compose", "ps", "-q"
-        );
-        pb.directory(projectDir);
-        pb.environment().put("PROJECT_PATH", projectDir.getAbsolutePath());
-
-        Process process = pb.start();
-
-        try (BufferedReader reader = new BufferedReader(
-                new InputStreamReader(process.getInputStream()))) {
-
-            return reader.lines().toList();
-        }
-    }
-
-    private Map<String, String> resolveComposeFile(
-            DockerRunner runner,
-            Problem problem
-    ) {
-
-        String framework = runner.getLibOrFramework();
-        Map<String, String> composeMap = problem.getComposeFile();
-
-        if (composeMap == null || composeMap.isEmpty()) {
-            throw new RuntimeException("No compose files configured");
-        }
-
-        if (!composeMap.containsKey(framework)) {
-            throw new RuntimeException(
-                    "No docker-compose found for framework: " + framework
+            BufferedReader err = new BufferedReader(
+                    new InputStreamReader(process.getErrorStream())
             );
-        }
+            err.lines().forEach(System.out::println);
 
-        // return in writeComposeFile compatible format
-        return Map.of(
-                "docker-compose.yml",
-                composeMap.get(framework)
-        );
+            process.waitFor();
+        } catch (Exception e) {
+            System.out.println("DB may already exist: ");
+        }
     }
 
+    private void createMongoDatabase(String previewId) throws Exception {
 
-    /**
-     * old one
-     */
-//    @Override
-//    public CustomResponse getPreviewURL(DockerRunner runner, Problem problem) {
-//        try {
-//            System.out.println("========== PREVIEW REQUEST ==========");
-//            System.out.println("Image       : " + runner.getImage_name());
-//            System.out.println("Framework   : " + runner.getLibOrFramework());
-//            System.out.println("Main file   : " + runner.getFile_name());
-//            System.out.println("Files tree  :");
-//
-//            logFileTree(runner.getFiles(), "  ");
-//            System.out.println("=====================================");
-//
-//            String previewId = UUID.randomUUID().toString();
-//            String projectRoot = new File(".").getCanonicalPath()
-//                    + "/workdir/preview-" + previewId;
-//
-//            File projectDir = new File(projectRoot);
-//            projectDir.mkdirs();
-//
-//            Path projectRootPath = projectDir.toPath();
-//
-//            // Write all files & folders
-//            writeFileTree(runner.getFiles(), projectRootPath);
-//            // 🔹 Express setup
-//            if (runner.getLibOrFramework().equals("express")) {
-//                writePackageJson(projectDir, false);
-//            }
-//
-//            // 🔹 TypeScript Express setup
-//            if (runner.getLibOrFramework().equals("ts-express")) {
-//                writePackageJson(projectDir, true);
-//                writeTsConfig(projectDir);
-//            }
-//
-//            // 🔹 Bind project directory with limit
-//            HostConfig hostConfig = HostConfig.newHostConfig()
-//                    .withBinds(new Bind(projectRoot, new Volume("/app")))
-//                    .withMemory(256L * 1024 * 1024)          // 256 MB RAM
-//                    .withMemorySwap(256L * 1024 * 1024)     // no swap
-//                    .withCpuPeriod(100_000L)
-//                    .withCpuQuota(50_000L)                  // 0.5 CPU
-//                    .withPidsLimit(64L);                    // fork bomb protection
-//
-//            System.out.println("host config is ready " + Arrays.toString(hostConfig.getBinds()));
-//
-//            // 🔹 Pull image if needed
-//            try {
-//                dockerClient.inspectImageCmd(runner.getImage_name()).exec();
-//            } catch (Exception e) {
-//                dockerClient.pullImageCmd(runner.getImage_name())
-//                        .start().awaitCompletion();
-//            }
-//
-//            ExposedPort exposedPort = switch (runner.getLibOrFramework()) {
-//                case "express", "ts-express" -> ExposedPort.tcp(3000);
-//                case "fastapi" -> ExposedPort.tcp(8000);
-//                default -> throw new RuntimeException("Unsupported framework");
-//            };
-//
-//            CreateContainerResponse container = dockerClient.createContainerCmd(runner.getImage_name())
-//                    .withHostConfig(
-//                            hostConfig.withPortBindings(
-//                                    new PortBinding(Ports.Binding.empty(), exposedPort)
-//                            )
-//                    )
-//                    .withExposedPorts(exposedPort)
-//                    .exec();
-//
-//            String containerId = container.getId();
-//            dockerClient.startContainerCmd(containerId).exec();
-//            streamContainerLogs(containerId);
-//
-//            // 🔹 Kill default process
-//            exec(containerId,
-//                    "pkill -9 node || true; pkill -9 python || true");
-//
-//            // 🔹 Run user app
-//            String cmd = switch (runner.getLibOrFramework()) {
-//                case "express" -> "ln -sf /runtime/node_modules /app/node_modules && sleep 1 && node /app/" + runner.getFile_name();
-//                case "ts-express" -> "tsx /app/" + runner.getFile_name();
-//                case "fastapi" -> "uvicorn " + runner.getFile_name().replace(".py", "")
-//                        + ":app --host 0.0.0.0 --port 8000";
-//                default -> "";
-//            };
-//
-//            exec(containerId, cmd + " &");
-//
-//            // 🔹 Get host port
-//            InspectContainerResponse inspect =
-//                    dockerClient.inspectContainerCmd(containerId).exec();
-//
-//            Ports.Binding[] bindings =
-//                    inspect.getNetworkSettings().getPorts().getBindings().get(exposedPort);
-//
-//            int hostPort = Integer.parseInt(bindings[0].getHostPortSpec());
-//
-//            // 🔹 Health check
-//            waitForServer(hostPort);
-//
-//            PreviewURL url = new PreviewURL(
-//                    "http://localhost:" + hostPort,
-//                    containerId,
-//                    hostPort
-//            );
-//
-//            Map<String, Object> data = new HashMap<>();
-//            data.put("containerId", containerId);
-//            data.put("fileId", previewId);
-//            data.put("fileName", runner.getFile_name());
-//            data.put("url", url);
-//
-//            return new CustomResponse(
-//                    data,
-//                    "Container started successfully",
-//                    200,
-//                    "200"
-//            );
-//
-//        } catch (Exception e) {
-//            System.out.println(e);
-//            return new CustomResponse(null, e.getMessage(), 500, null);
-//        }
-//    }
-    @Override
-    public CustomResponse getPreviewURL(DockerRunner runner, Problem problem, String previewId) {
+        String dbName = "mongo_" + previewId;
+        String dbUser = "user_" + previewId;
+        String dbPass = "pass_" + previewId;
+
         try {
-            System.out.println("========== PREVIEW REQUEST ==========");
+            String js = String.format("""
+                    db = db.getSiblingDB('%s');
+                    db.createUser({
+                        user: '%s',
+                        pwd: '%s',
+                        roles: [{ role: 'readWrite', db: '%s' }]
+                    });
+                    """, dbName, dbUser, dbPass, dbName);
 
-            String projectRoot = new File(".").getCanonicalPath()
-                    + "/workdir/preview-" + previewId;
-
-            // create workdir
-            File projectDir = new File(projectRoot);
-            projectDir.mkdirs();
-
-            // log user files
-            logFileTree(runner.getFiles(), "");
-
-            // write user project
-            writeFileTree(runner.getFiles(), projectDir.toPath());
-
-            // write compose
-            Map<String, String> composeFile =
-                    resolveComposeFile(runner, problem);
-
-            writeComposeFile(composeFile, projectDir.toPath());
-
-            // docker compose up
-            String containerId = runCompose(projectDir, previewId);
-            System.out.println("RUN COMPOSE DONE, containerId = " + containerId);
-
-            logWebSocketHandler.bindContainer(previewId, containerId);
-
-            // stream logs
-            streamContainerLogs(containerId, previewId);
-
-
-            // detect port
-            int hostPort = getComposePort(containerId);
-
-            // health check
-            waitForServer(hostPort);
-
-            PreviewURL url = new PreviewURL(
-                    "http://localhost:" + hostPort,
-                    "compose-" + previewId,
-                    hostPort
+            ProcessBuilder pb = new ProcessBuilder(
+                    "docker", "exec", "-i", "problem-mongodb",
+                    "mongosh",
+                    "-u", "user",
+                    "-p", "password",
+                    "--authenticationDatabase", "admin",
+                    "--eval", js
             );
 
-            Map<String, Object> data = new HashMap<>();
-            data.put("projectId","preview-" + previewId);
-            data.put("url", url);
-            data.put("containerId", containerId);
-            data.put("fileId", previewId);
-            data.put("fileName", runner.getFile_name());
+            Process process = pb.start();
+            process.waitFor();
 
-            return new CustomResponse(
-                    data,
-                    "Preview started successfully",
-                    200,
-                    "200"
-            );
+            System.out.println("✅ Created MongoDB user + DB: " + dbName);
 
         } catch (Exception e) {
-            e.printStackTrace();
-            return new CustomResponse(null, e.getMessage(), 500, null);
+            System.out.println("MongoDB may already exist: " + dbName);
         }
     }
 
+    private void createRedisUser(String previewId) throws Exception {
+
+        String redisUser = "user_" + previewId;
+        String redisPass = "pass_" + previewId;
+        String prefix = "preview_" + previewId + ":";
+
+        try {
+            String command = String.format(
+                    "ACL SETUSER %s on >%s ~%s* +@all",
+                    redisUser,
+                    redisPass,
+                    prefix
+            );
+
+            ProcessBuilder pb = new ProcessBuilder(
+                    "docker", "exec", "-i", "problem-redis",
+                    "redis-cli",
+                    command
+            );
+
+            Process process = pb.start();
+            process.waitFor();
+
+            System.out.println("✅ Created Redis user: " + redisUser);
+
+        } catch (Exception e) {
+            System.out.println("Redis user may already exist: " + redisUser);
+        }
+    }
+
+    private String buildStartCommand(String image) {
+        return switch (image) {
+            case "fastapi-py" -> "uvicorn index:app --host 0.0.0.0 --port 3000";
+            case "express-js" -> "node src/index.js";
+            case "express-ts" -> "npx tsc && node dist/index.js";
+            default -> null;
+        };
+    }
 
     private void exec(String containerId, String cmd) throws Exception {
         String id = dockerClient.execCreateCmd(containerId)
@@ -591,61 +325,231 @@ public class DockerService implements IDockerRepo {
             }
             Thread.sleep(1000);
         }
-        logWebSocketHandler.sendEvent("compose-preview-1","LOG","Server failed to start");
+        logWebSocketHandler.sendEvent("compose-preview-1", "LOG", "Server failed to start");
         throw new RuntimeException("Server failed to start");
     }
 
-    private void writePackageJson(File dir, boolean ts) throws Exception {
-        try (FileWriter writer = new FileWriter(new File(dir, "package.json"))) {
-            writer.write(ts ? """
-                        {
-                          "type": "module",
-                          "dependencies": { "express": "^4.19.0" },
-                          "devDependencies": {
-                            "typescript": "^5.0.0",
-                            "tsx": "^4.7.0",
-                            "@types/node": "^20.0.0",
-                            "@types/express": "^4.17.21"
-                          }
-                        }
-                    """ : """
-                        {
-                          "type": "module",
-                          "dependencies": { "express": "^4.19.0" }
-                        }
-                    """);
+    private void cleanupResources(String previewId) {
+        try {
+            String safeId = previewId.replace("-", "_");
+
+            String dbName = "db_" + safeId;
+            String dbUser = "user_" + safeId;
+            String mongoDb = "mongo_" + safeId;
+            String redisUser = "user_" + safeId;
+
+            // 🔹 POSTGRES CLEANUP
+            execPostgres(String.format("DROP DATABASE IF EXISTS %s;", dbName));
+            execPostgres(String.format("DROP ROLE IF EXISTS %s;", dbUser));
+
+            // 🔹 MONGODB CLEANUP
+            ProcessBuilder mongoPb = new ProcessBuilder(
+                    "docker", "exec", "-i", "problem-mongodb",
+                    "mongosh",
+                    "-u", "user",
+                    "-p", "password",
+                    "--authenticationDatabase", "admin",
+                    "--eval",
+                    String.format("""
+                        db = db.getSiblingDB('%s');
+                        db.dropDatabase();
+                        db.dropUser('%s');
+                        """, mongoDb, dbUser)
+            );
+            mongoPb.start().waitFor();
+
+            // 🔹 REDIS CLEANUP
+            ProcessBuilder redisPb = new ProcessBuilder(
+                    "docker", "exec", "-i", "problem-redis",
+                    "redis-cli",
+                    "ACL", "DELUSER", redisUser
+            );
+            redisPb.start().waitFor();
+
+            log.info("✅ Cleaned resources for {}", previewId);
+
+        } catch (Exception e) {
+            log.error("Cleanup failed for {}", previewId, e);
         }
     }
 
-    private void writeTsConfig(File dir) throws Exception {
-        try (FileWriter writer = new FileWriter(new File(dir, "tsconfig.json"))) {
-            writer.write("""
-                        {
-                          "compilerOptions": {
-                            "target": "ES2020",
-                            "module": "ESNext",
-                            "moduleResolution": "Node",
-                            "esModuleInterop": true
-                          }
-                        }
-                    """);
+    @Override
+    public CustomResponse getPreviewURL(DockerRunner runner, Problem problem, String previewId) {
+        try {
+            System.out.println("========== PREVIEW REQUEST ==========");
+
+            String projectRoot = new File(".").getCanonicalPath()
+                    + "/workdir/preview-" + previewId;
+
+            File projectDir = new File(projectRoot);
+            projectDir.mkdirs();
+
+            Path projectRootPath = projectDir.toPath();
+
+            // 🔹 Write project files
+            writeFileTree(runner.getFiles(), projectRootPath);
+
+            String image = runner.getImage_name();
+            String containerName = "preview-" + previewId;
+
+            // 🔹 Ensure image exists
+            try {
+                dockerClient.inspectImageCmd(image).exec();
+            } catch (Exception e) {
+                dockerClient.pullImageCmd(image).start().awaitCompletion();
+            }
+
+            // envList
+            List<String> envList = new ArrayList<>();
+
+            // 🔹 Traefik labels
+            Map<String, String> labels = new HashMap<>();
+            String postfix_url = containerName + "." + domain;
+
+            // Router
+            labels.put("traefik.http.routers." + containerName + ".rule",
+                    "Host(`" + postfix_url + "`)");
+
+
+            //create db
+            List<ServiceType> services = problem.getServices();
+            String safeId = previewId.replace("-", "_");
+            if (services.contains(ServiceType.POSTGRES)) {
+                //create postgres of exec-id
+
+
+                String dbName = "db_" + safeId;
+                String dbUser = "user_" + safeId;
+                String dbPass = "pass_" + safeId;
+
+                String createUser = String.format(
+                        "CREATE USER %s WITH PASSWORD '%s';",
+                        dbUser, dbPass
+                );
+
+                String createDb = String.format(
+                        "CREATE DATABASE %s OWNER %s;",
+                        dbName, dbUser
+                );
+
+                String alterRole = String.format(
+                        "ALTER ROLE %s NOSUPERUSER NOCREATEDB NOCREATEROLE;",
+                        dbUser
+                );
+                execPostgres(createUser);
+                execPostgres(createDb);
+                execPostgres(alterRole);
+
+
+                envList.add("PG_HOST=problem-postgres");
+                envList.add("PG_PORT=5432");
+                envList.add("PG_USER=" + dbUser);
+                envList.add("PG_PASSWORD=" + dbPass);
+                envList.add("PG_DATABASE=" + dbName);
+            }
+            if (services.contains(ServiceType.MONGODB)) {
+                //create mongodb
+                String mongoDb = "mongo_" + safeId;
+                String mongoUser = "user_" + safeId;
+                String mongoPass = "pass_" + safeId;
+
+                createMongoDatabase(safeId);
+
+                envList.add(
+                        "MONGO_URI=mongodb://" + mongoUser + ":" + mongoPass +
+                                "@mongodb:27017/" + mongoDb + "?authSource=" + mongoDb
+                );
+            }
+//            if (services.contains(ServiceType.REDIS)) {
+//                String redisUser = "user_" + previewId;
+//                String redisPass = "pass_" + previewId;
+//                String prefix = "preview_" + previewId + ":";
+//
+//                createRedisUser(previewId);
+//
+//                envList.add("REDIS_HOST=problem-redis");
+//                envList.add("REDIS_PORT=6379");
+//                envList.add("REDIS_USERNAME=" + redisUser);
+//                envList.add("REDIS_PASSWORD=" + redisPass);
+//                envList.add("REDIS_PREFIX=" + prefix);
+//            }
+
+            // 🔹 Host config
+            HostConfig hostConfig = HostConfig.newHostConfig()
+                    .withBinds(new Bind(projectRoot + "/src", new Volume("/app/src")))
+                    .withMemory(256L * 1024 * 1024)
+                    .withMemorySwap(256L * 1024 * 1024)
+                    .withCpuPeriod(100_000L)
+                    .withCpuQuota(50_000L)
+                    .withPidsLimit(64L);
+
+            // 🔹 Create container
+            CreateContainerResponse container = dockerClient.createContainerCmd(image)
+                    .withName(containerName)
+                    .withHostConfig(hostConfig)
+                    .withWorkingDir("/app")
+                    .withCmd("sh", "-c", buildStartCommand(runner.getImage_name()))
+                    .withLabels(labels)
+                    .withNetworkMode(network)
+                    .withEnv(envList)
+                    .exec();
+
+            String containerId = container.getId();
+
+            // 🔹 Start container
+            dockerClient.startContainerCmd(containerId).exec();
+
+            // 🔹 Logs
+            streamContainerLogs(containerId, previewId);
+
+            //send out traefik url to test out
+            logWebSocketHandler.sendEvent(
+                    previewId,
+                    "URL",
+                    protocol + "://" + postfix_url
+            );
+
+            //send env list
+            logWebSocketHandler.sendEvent(
+                    previewId,
+                    "ENV",
+                    envList
+            );
+
+            // 🔹 URL (Traefik)
+//
+            PreviewURL url = new PreviewURL(
+                    postfix_url,
+                    containerId,
+                    0
+            );
+
+            Map<String, Object> data = new HashMap<>();
+            data.put("projectId", "preview-" + previewId);
+            data.put("url", url);
+            data.put("fileId", previewId);
+            data.put("fileName", runner.getFile_name());
+
+            return new CustomResponse(data, "Preview started", 200, null);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new CustomResponse(null, e.getMessage(), 500, null);
         }
     }
+
 
     @Override
     public CustomResponse deleteContainer(String projectId, String fileId, String fileName) {
         try {
             log.info("Deleting container for fileId: {}", fileId);
             log.info("Project ID: {}", projectId);
-            ProcessBuilder builder = new ProcessBuilder(
-                    "docker", "compose",
-                    "-p", projectId,
-                    "down",
-                    "-v"
-            );
+            dockerClient.removeContainerCmd(projectId).withForce(true).exec();
 
-            builder.start().waitFor();
             log.info("Container deleted successfully");
+            // 🔹 cleanup DB + Redis + Mongo
+            cleanupResources(fileId);
+
 
             Path workdir = Paths.get(
                     new File(".").getCanonicalPath(),

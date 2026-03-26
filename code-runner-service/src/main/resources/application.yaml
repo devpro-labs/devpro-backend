@@ -13,9 +13,7 @@ spring:
   data:
     redis:
       port: ${REDIS_PORT:6379}
-      host: ${REDIS_HOST:redis}
-      password: ${REDIS_PASSWORD}
-      username: default
+      host: ${REDIS_HOST:localhost}
 
 #port
 server:
@@ -48,3 +46,9 @@ limits:
   global:
     req: ${MAX_GLOBAL_REQ}
     time: ${GLOBAL_SEC}
+
+#proxy host for traefik
+traefik:
+  domain: ${DOMAIN}
+  network: ${NETWORK:devpro-network}
+  protocol: ${PROTOCOL:http}

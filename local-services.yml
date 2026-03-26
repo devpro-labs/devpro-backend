@@ -2,28 +2,33 @@ version: "3.8"
 
 services:
 
-  #for consul service registry
+  # consul service registry
   consul:
-    image:  hashicorp/consul
+    image: hashicorp/consul
     container_name: consul
     ports:
       - 8500:8500
+    volumes:
+      - consul_data:/consul/data
+    networks:
+      - devpro-network
 
-
-  #postgres db
+  # postgres db
   postgres:
     image: postgres:16-alpine
     container_name: postgres-devpro
     ports:
-      - 5432:5432 #db
+      - 5432:5432
     environment:
       POSTGRES_DB: DevPro-dev
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: devan
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - devpro-network
 
-
-
-  #see ui or data of postgres
+  # adminer UI
   adminer:
     image: adminer:latest
     container_name: adminer-devpro
@@ -32,17 +37,101 @@ services:
       - 5433:8080
     depends_on:
       - postgres
+    networks:
+      - devpro-network
 
-
-  #redis
+  # redis
   redis:
     image: redis:7.2-alpine
     container_name: devpro-redis
     ports:
-        - "6379:6379"
+      - "6379:6379"
     command: >
       redis-server
       --notify-keyspace-events Ex
       --appendonly yes
-      --requirepass devpro_redis
     restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - devpro-network
+
+  # traefik
+  traefik:
+    image: traefik:v3.6
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - devpro-network
+
+
+
+
+
+
+
+
+
+  #postgres, redis and mongodb for common devs
+  problem-postgres:
+    container_name: "problem-postgres"
+
+    image: postgres-common
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=db
+    networks:
+      - devpro-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U user -d db" ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  problem-redis:
+    container_name: "problem-redis"
+    image: redis-common
+    restart: unless-stopped
+    networks:
+      - devpro-network
+    healthcheck:
+      test: [ "CMD", "redis-cli", "-a", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+
+  problem-mongodb:
+    container_name: "problem-mongodb"
+    image: mongodb-common
+    restart: unless-stopped
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=user
+      - MONGO_INITDB_ROOT_PASSWORD=password
+      - MONGO_INITDB_DATABASE=db
+    networks:
+      - devpro-network
+
+
+networks:
+  devpro-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
+  consul_data:

@@ -1,0 +1,52 @@
+version: "3.8"
+
+services:
+  redis:
+    container_name: "problem-redis"
+    ports:
+      - "9999:6379"
+    image: redis-common
+    restart: unless-stopped
+    networks:
+      - problem-nk
+    healthcheck:
+      test: [ "CMD", "redis-cli", "-a", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  postgres:
+    container_name: "problem-postgres"
+    ports:
+      - "8888:5432"
+    image: postgres-common
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=db
+    networks:
+      - problem-nk
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d db"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+
+  mongodb:
+    container_name: "problem-mongodb"
+    ports:
+      - "7777:27017"
+    image: mongodb-common
+    restart: unless-stopped
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=user
+      - MONGO_INITDB_ROOT_PASSWORD=password
+      - MONGO_INITDB_DATABASE=db
+    networks:
+      - problem-nk
+
+networks:
+  problem-nk:
+    driver: bridge

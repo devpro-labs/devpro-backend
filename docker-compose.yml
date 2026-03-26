@@ -42,7 +42,7 @@ services:
       postgres:
         condition: service_healthy
     networks:
-        - devpro-network
+      - devpro-network
 
   redis:
     image: redis:7.2-alpine
@@ -89,7 +89,7 @@ services:
         condition: service_healthy
     networks:
       - devpro-network
-#
+  #
   problem-service:
     build: ./problem-service
     container_name: devpro-problem-service
@@ -106,7 +106,7 @@ services:
         condition: service_healthy
     networks:
       - devpro-network
-#
+  #
   code-runner-service:
     build: ./code-runner-service
     container_name: devpro-code-runner

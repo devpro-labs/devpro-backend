@@ -3,8 +3,6 @@ version: "3.8"
 services:
   express:
     image: express-js
-    ports:
-      - "3000"
     restart: unless-stopped
     volumes:
       - ${PROJECT_PATH}:/app/src
@@ -12,7 +10,6 @@ services:
       - PORT=3000
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - REDIS_PASSWORD=redispassword
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
       - POSTGRES_USER=user
@@ -30,11 +27,10 @@ services:
   redis:
     image: redis-common
     restart: unless-stopped
-    command: [ "redis-server", "--requirepass", "redispassword" ]
     networks:
       - app-network
     healthcheck:
-      test: [ "CMD", "redis-cli", "-a", "redispassword", "ping" ]
+      test: [ "CMD", "redis-cli", "-a", "ping" ]
       interval: 5s
       timeout: 3s
       retries: 10

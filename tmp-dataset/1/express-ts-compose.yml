@@ -2,9 +2,7 @@ version: "3.8"
 
 services:
   express:
-    image: fastapi-py
-    ports:
-      - "3000"
+    image: express-ts
     restart: unless-stopped
     volumes:
       - ${PROJECT_PATH}:/app/src
@@ -20,7 +18,7 @@ services:
       - CACHE_TTL_SECONDS=60
     depends_on:
       redis:
-        condition: service_started
+        condition: service_healthy
       postgres:
         condition: service_healthy
     networks:
@@ -31,6 +29,11 @@ services:
     restart: unless-stopped
     networks:
       - app-network
+    healthcheck:
+      test: [ "CMD", "redis-cli", "-a", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
   postgres:
     image: postgres-common
@@ -43,6 +46,9 @@ services:
       - app-network
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U user" ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
 networks:
   app-network:
