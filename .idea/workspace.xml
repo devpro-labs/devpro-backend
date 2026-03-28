@@ -61,44 +61,44 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "HTTP Request. | Create problem (JSON + multiple compose files)#2.executor": "Run",
-    "HTTP Request. | Create problem (JSON + multiple compose files).executor": "Run",
-    "HTTP Request.1 | #1.executor": "Run",
-    "HTTP Request.2 | #1.executor": "Run",
-    "HTTP Request.2 | #2.executor": "Run",
-    "HTTP Request.3 | #1.executor": "Run",
-    "HTTP Request.3 | Create problem (JSON + multiple compose files).executor": "Run",
-    "HTTP Request.4 | #1.executor": "Run",
-    "HTTP Request.All in .executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RequestMappingsPanelOrder0": "0",
-    "RequestMappingsPanelOrder1": "1",
-    "RequestMappingsPanelWidth0": "75",
-    "RequestMappingsPanelWidth1": "75",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "Spring Boot.CodeRunnerServiceApplication.executor": "Run",
-    "Spring Boot.ProblemServiceApplication.executor": "Run",
-    "Spring Boot.UserServiceApplication.executor": "Run",
-    "Spring Boot.gateway.executor": "Run",
-    "git-widget-placeholder": "main",
-    "junie.onboarding.icon.badge.shown": "true",
-    "kotlin-language-version-configured": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "run.configurations.included.in.services": "true",
-    "service.view.auto.scroll.to.source": "true",
-    "settings.editor.selected.configurable": "settings.sync",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;HTTP Request. | Create problem (JSON + multiple compose files)#2.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request. | Create problem (JSON + multiple compose files).executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request.1 | #1.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request.2 | #1.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request.2 | #2.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request.3 | #1.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request.3 | Create problem (JSON + multiple compose files).executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request.4 | #1.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request.All in .executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
+    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
+    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
+    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;Spring Boot.CodeRunnerServiceApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.ProblemServiceApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.UserServiceApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Spring Boot.gateway.executor&quot;: &quot;Run&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;run.configurations.included.in.services&quot;: &quot;true&quot;,
+    &quot;service.view.auto.scroll.to.source&quot;: &quot;true&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;settings.sync&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="D:\DevPro-lab\devpro-backend\tmp-dataset" />
@@ -255,7 +255,7 @@
       <workItem from="1774501571832" duration="17537000" />
       <workItem from="1774533027805" duration="11693000" />
       <workItem from="1774592030512" duration="22985000" />
-      <workItem from="1774684692412" duration="15603000" />
+      <workItem from="1774684692412" duration="17943000" />
     </task>
     <servers />
   </component>
