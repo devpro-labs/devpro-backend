@@ -102,18 +102,6 @@ services:
       timeout: 3s
       retries: 10
 
-  problem-redis:
-    container_name: "problem-redis"
-    image: redis-common
-    restart: unless-stopped
-    networks:
-      - devpro-network
-    healthcheck:
-      test: [ "CMD", "redis-cli", "-a", "ping" ]
-      interval: 5s
-      timeout: 3s
-      retries: 10
-
 
   problem-mongodb:
     container_name: "problem-mongodb"

@@ -8,80 +8,258 @@ Content-Disposition: form-data; name="problem"
 Content-Type: application/json
 
 {
-"title": "Basic REST API with MongoDB",
-"description": "Build a REST API using MongoDB. Implement POST /users to create a user, GET /users/:id to fetch a user by ObjectId, and GET /health to check server status. Return 404 if user not found.",
-"difficulty": "CASUAL",
-"tags": ["mongodb", "backend", "crud", "express"],
-"entryFile": "index",
-"services": ["REST", "MONGODB"],
-"keys": {
-"PORT": "***",
-"MONGO_URI": "***"
-},
-"timeLimitSeconds": 5,
-"memoryLimitMB": 256,
-"cpuLimit": 0.5,
-
-"testCases": [
-{
-"input": {
-"name": "John Doe"
-},
-"expectedOutput": {
-"name": "John Doe"
-},
-"expectedStatus": 201,
-"isHidden": false,
-"method": "POST",
-"endpoint": "/users"
-},
-{
-"input": {},
-"expectedOutput": {
-"name": "John Doe"
-},
-"expectedStatus": 200,
-"isHidden": false,
-"method": "GET",
-"endpoint": "/users/:id",
-"usePreviousId": true
-},
-{
-"input": {},
-"expectedOutput": {
-"error": "User not found"
-},
-"expectedStatus": 404,
-"isHidden": true,
-"method": "GET",
-"endpoint": "/users/invalid-id"
-},
-{
-"input": {},
-"expectedOutput": {
-"message": "Health OK"
-},
-"expectedStatus": 200,
-"isHidden": true,
-"method": "GET",
-"endpoint": "/health"
+  "title": "Clinic Appointment Booking API",
+  "description": "Build a MongoDB-backed REST API for a clinic. Implement POST /appointments to create an appointment with patientName, doctorName, slotTime, and status (default: scheduled). Implement GET /appointments/:id to fetch by ObjectId. Implement PATCH /appointments/:id/status to update status to confirmed or cancelled. Implement GET /health. Return 404 when appointment is not found.",
+  "difficulty": "CASUAL",
+  "tags": [
+    "mongodb",
+    "backend",
+    "express",
+    "health-check"
+  ],
+  "entryFile": "index",
+  "services": [
+    "REST",
+    "MONGODB"
+  ],
+  "keys": {
+    "PORT": "***",
+    "MONGO_URI": "***"
+  },
+  "timeLimitSeconds": 6,
+  "memoryLimitMB": 256,
+  "cpuLimit": 0.5,
+  "testCases": [
+    {
+      "input": {
+        "patientName": "Aisha Khan",
+        "doctorName": "Dr. Roy",
+        "slotTime": "2026-05-03T09:30:00Z",
+        "qid" : 1
+      },
+      "expectedOutput": {
+        "patientName": "Aisha Khan",
+        "doctorName": "Dr. Roy",
+        "status": "scheduled",
+        "qid": 1
+      },
+      "expectedStatus": 201,
+      "isHidden": false,
+      "method": "POST",
+      "endpoint": "/appointments"
+    },
+    {
+      "input": {},
+      "expectedOutput": {
+        "patientName": "Aisha Khan",
+        "doctorName": "Dr. Roy",
+        "status": "scheduled"
+      },
+      "expectedStatus": 200,
+      "isHidden": false,
+      "method": "GET",
+      "endpoint": "/appointments/1",
+      "usePreviousId": true
+    },
+    {
+      "input": {
+        "status": "confirmed"
+      },
+      "expectedOutput": {
+        "status": "confirmed"
+      },
+      "expectedStatus": 200,
+      "isHidden": false,
+      "method": "PATCH",
+      "endpoint": "/appointments/1/status",
+      "usePreviousId": true
+    },
+    {
+      "input": {},
+      "expectedOutput": {
+        "message": "Health OK"
+      },
+      "expectedStatus": 200,
+      "isHidden": false,
+      "method": "GET",
+      "endpoint": "/health"
+    },
+    {
+      "input": {},
+      "expectedOutput": {
+        "error": "Appointment not found"
+      },
+      "expectedStatus": 404,
+      "isHidden": false,
+      "method": "GET",
+      "endpoint": "/appointments/2"
+    },
+    {
+      "input": {
+        "status": "cancelled"
+      },
+      "expectedOutput": {
+        "error": "Appointment not found"
+      },
+      "expectedStatus": 404,
+      "isHidden": true,
+      "method": "PATCH",
+      "endpoint": "/appointments/2/status"
+    },
+    {
+      "input": {},
+      "expectedOutput": {
+        "error": "Appointment not found"
+      },
+      "expectedStatus": 404,
+      "isHidden": true,
+      "method": "GET",
+      "endpoint": "/appointments/3"
+    },
+    {
+      "input": {
+        "status": "confirmed"
+      },
+      "expectedOutput": {
+        "error": "Appointment not found"
+      },
+      "expectedStatus": 404,
+      "isHidden": true,
+      "method": "PATCH",
+      "endpoint": "/appointments/3/status"
+    }
+  ]
 }
-]
+------DevProBoundary--
+
+###
+
+POST http://localhost:9000/api/problems
+X-API-KEY: devpro1580
+Accept: application/json
+Content-Type: multipart/form-data; boundary=----DevProBoundary
+
+------DevProBoundary
+Content-Disposition: form-data; name="problem"
+Content-Type: application/json
+
+{
+  "title": "Warehouse Inventory Control API",
+  "description": "Build a PostgreSQL REST API for warehouse inventory. Implement POST /products to create products with sku, name, and stock. Implement GET /products/:id to fetch a product by id. Implement PATCH /products/:id/stock to update stock. Implement GET /products/low-stock/:threshold to list products where stock is less than or equal to threshold. Return 404 if product is not found.",
+  "difficulty": "PRO",
+  "tags": [
+    "postgresql",
+    "inventory",
+    "backend",
+    "crud"
+  ],
+  "entryFile": "index",
+  "services": [
+    "REST",
+    "POSTGRES"
+  ],
+  "keys": {
+    "PORT": "***",
+    "PG_URI": "***"
+  },
+  "timeLimitSeconds": 7,
+  "memoryLimitMB": 256,
+  "cpuLimit": 0.5,
+  "testCases": [
+    {
+      "input": {
+        "sku": "MUG-100",
+        "name": "Ceramic Mug",
+        "stock": 8,
+        "qid" : 1
+      },
+      "expectedOutput": {
+        "sku": "MUG-100",
+        "name": "Ceramic Mug",
+        "stock": 8,
+        "qid": 1
+      },
+      "expectedStatus": 201,
+      "isHidden": false,
+      "method": "POST",
+      "endpoint": "/products"
+    },
+    {
+      "input": {},
+      "expectedOutput": {
+        "sku": "MUG-100",
+        "name": "Ceramic Mug",
+        "stock": 8
+      },
+      "expectedStatus": 200,
+      "isHidden": false,
+      "method": "GET",
+      "endpoint": "/products/1",
+      "usePreviousId": true
+    },
+    {
+      "input": {
+        "stock": 3
+      },
+      "expectedOutput": {
+        "stock": 3
+      },
+      "expectedStatus": 200,
+      "isHidden": false,
+      "method": "PATCH",
+      "endpoint": "/products/1/stock",
+      "usePreviousId": true
+    },
+    {
+      "input": {},
+      "expectedOutput": {
+        "count": 1
+      },
+      "expectedStatus": 200,
+      "isHidden": false,
+      "method": "GET",
+      "endpoint": "/products/low-stock/5"
+    },
+    {
+      "input": {},
+      "expectedOutput": {
+        "error": "Product not found"
+      },
+      "expectedStatus": 404,
+      "isHidden": true,
+      "method": "GET",
+      "endpoint": "/products/2"
+    },
+    {
+      "input": {
+        "stock": 10
+      },
+      "expectedOutput": {
+        "error": "Product not found"
+      },
+      "expectedStatus": 404,
+      "isHidden": true,
+      "method": "PATCH",
+      "endpoint": "/products/2/stock"
+    },
+    {
+      "input":{
+        "sku" : "MUG-101",
+        "name" : "Glass Mug",
+        "stock" : 5,
+        "qid" : 2
+      },
+      "expectedOutput":{
+        "sku" : "MUG-101",
+        "name" : "Glass Mug",
+        "stock" : 5,
+        "qid" : 2
+      },
+      "expectedStatus": 201,
+      "isHidden": true,
+      "method": "POST",
+      "endpoint": "/products"
+    }
+  ]
 }
-
-------DevProBoundary
-Content-Disposition: form-data; name="composeFiles"; filename="express-js-compose.yml"
-Content-Type: application/x-yaml
-
-< ./1/express-js-compose.yml
-------DevProBoundary
-Content-Disposition: form-data; name="composeFiles"; filename="express-ts-compose.yml"
-Content-Type: application/x-yaml
-
-< ./1/express-js-compose.yml
-------DevProBoundary
-Content-Disposition: form-data; name="composeFiles"; filename="fatspai-py.yml"
-Content-Type: application/x-yaml
-
-< ./1/express-js-compose.yml
 ------DevProBoundary--

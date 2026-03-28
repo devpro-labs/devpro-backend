@@ -1,18 +1,17 @@
 package com.devpro.problem_service.service;
 
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.net.http.HttpRequest;
+import java.util.*;
 
+import com.devpro.problem_service.dto.ProblemResponse;
 import com.devpro.problem_service.dto.TestCaseRequest;
-import com.devpro.problem_service.model.CustomResponse;
-import com.devpro.problem_service.model.TestCase;
+import com.devpro.problem_service.model.*;
+import com.devpro.problem_service.repository.SubmissionRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import com.devpro.problem_service.dto.ProblemRequest;
-import com.devpro.problem_service.model.Problem;
 import com.devpro.problem_service.repository.ProblemRepository;
 
 @Service
@@ -20,6 +19,7 @@ public class ProblemService {
 
     private final ProblemRepository repository;
     private final TestCaseService testCaseService;
+    private final SubmissionRepository submissionRepository;
 
     private void map(ProblemRequest request,Problem p) {
 
@@ -37,9 +37,10 @@ public class ProblemService {
     }
 
 
-    public ProblemService(ProblemRepository repository, TestCaseService testCaseService) {
+    public ProblemService(ProblemRepository repository, TestCaseService testCaseService, SubmissionRepository submissionRepository) {
         this.repository = repository;
         this.testCaseService = testCaseService;
+        this.submissionRepository = submissionRepository;
     }
 
     // CREATE
@@ -70,10 +71,24 @@ public class ProblemService {
     }
 
     // READ ALL
-    public CustomResponse getAll() {
+    public CustomResponse getAll(String userId) {
         List<Problem> problems = repository.findAll();
+
+        //get submissions and add to object
+        List<UUID> submissions = submissionRepository.findAllProblemIdByUserIdAndStatus(userId, SubmissionStatus.ACCEPTED);
+
+        List<ProblemResponse> data = new ArrayList<>();
+        Map<UUID, Boolean> submissionMap = new HashMap<>();
+        for (UUID submissionId : submissions) {
+            submissionMap.put(submissionId, true);
+        }
+
+        for (Problem p : problems) {
+            data.add(new ProblemResponse(p, submissionMap.getOrDefault(p.getId(), false)));
+        }
+
         System.out.println(problems.size() + " " + problems.getFirst().toString());
-        Map<String, Object> DATA = Map.of("problems", problems);
+        Map<String, Object> DATA = Map.of("problems", data);
         return new CustomResponse(
                 DATA,
                 "Problems fetched successfully.",

@@ -2,6 +2,7 @@ package com.devpro.problem_service.dto;
 
 import java.util.UUID;
 
+import com.devpro.problem_service.model.Problem;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,10 +12,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ProblemResponse {
 
-    private UUID id;
-    private String title;
-    private String slug;
-    private String difficulty;
-    private String category;
-    private Boolean isActive;
+   private Problem problem;
+   private Boolean isSolved;
 }

@@ -6,6 +6,7 @@ import com.devpro.problem_service.dto.ProfileUpdateRequest;
 import com.devpro.problem_service.model.CustomResponse;
 import com.devpro.problem_service.model.Problem;
 import com.devpro.problem_service.model.Submission;
+import com.devpro.problem_service.model.SubmissionStatus;
 import com.devpro.problem_service.repository.ProblemRepository;
 import com.devpro.problem_service.repository.SubmissionRepository;
 import jakarta.servlet.http.HttpServletRequest;
@@ -56,7 +57,7 @@ public class SubmissionService {
             log.info("Submission created");
 
             //check a problem is already done or not
-            boolean isAlreadyDone = submissionRepository.existsByUserIdAndProblemId(api.getUserId(), api.getProblemId());
+            boolean isAlreadyDone = submissionRepository.existsByUserIdAndProblemIdAndStatus(api.getUserId(), api.getProblemId(), SubmissionStatus.ACCEPTED);
 
             //submission add
             submissionRepository.save(submission);

@@ -347,15 +347,12 @@ public class DockerService implements IDockerRepo {
 
         for (int i = 0; i < retries; i++) {
             try {
-                ResponseEntity<JsonNode> res = webClient.get()
-                        .uri(baseUrl )
-                        .exchangeToMono(response -> response.toEntity(JsonNode.class))
+                ResponseEntity<Void> res = webClient.get()
+                        .uri(baseUrl)
+                        .exchangeToMono(response -> response.toBodilessEntity())
                         .block();
 
-                log.info(res.toString());
-
-                if (res != null && res.getStatusCodeValue() != 400 &&  res.getStatusCodeValue() != 500) {
-
+                if (res != null && (res.getStatusCode().is2xxSuccessful() || res.getStatusCode().is3xxRedirection() || res.getStatusCode().is4xxClientError())) {
                     log.info("✅ Server FULLY READY for {}", previewId);
                     return;
                 }
@@ -395,12 +392,12 @@ public class DockerService implements IDockerRepo {
                     """, mongoDb, dbUser));
 
             // 🔹 REDIS CLEANUP
-            ProcessBuilder redisPb = new ProcessBuilder(
-                    "docker", "exec", "-i", "problem-redis",
-                    "redis-cli",
-                    "ACL", "DELUSER", redisUser
-            );
-            redisPb.start().waitFor();
+//            ProcessBuilder redisPb = new ProcessBuilder(
+//                    "docker", "exec", "-i", "problem-redis",
+//                    "redis-cli",
+//                    "ACL", "DELUSER", redisUser
+//            );
+//            redisPb.start().waitFor();
 
             log.info("✅ Cleaned resources for {}", previewId);
 
@@ -496,19 +493,19 @@ public class DockerService implements IDockerRepo {
                                 "@problem-mongodb:27017/" + mongoDb + "?authSource=admin"
                 );
             }
-            if (services.contains(ServiceType.REDIS)) {
-                String redisUser = "user_" + previewId;
-                String redisPass = "pass_" + previewId;
-                String prefix = "preview_" + previewId + ":";
-
-                createRedisUser(previewId);
-
-                envList.add("REDIS_HOST=problem-redis");
-                envList.add("REDIS_PORT=6379");
-                envList.add("REDIS_USERNAME=" + redisUser);
-                envList.add("REDIS_PASSWORD=" + redisPass);
-                envList.add("REDIS_PREFIX=" + prefix);
-            }
+//            if (services.contains(ServiceType.REDIS)) {
+//                String redisUser = "user_" + safeId;
+//                String redisPass = "pass_" + safeId;
+//                String prefix = "preview_" + safeId + ":";
+//
+//                createRedisUser(safeId);
+//
+//                envList.add("REDIS_HOST=problem-redis");
+//                envList.add("REDIS_PORT=6379");
+//                envList.add("REDIS_USERNAME=" + redisUser);
+//                envList.add("REDIS_PASSWORD=" + redisPass);
+//                envList.add("REDIS_PREFIX=" + prefix);
+//            }
 
             // 🔹 Host config
             HostConfig hostConfig = HostConfig.newHostConfig()

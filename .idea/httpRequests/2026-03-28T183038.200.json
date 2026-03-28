@@ -1,0 +1,33 @@
+{
+  "DATA": {
+    "problem": {
+      "id": "16fc4786-5b35-4bfd-baf5-2e1cacfa6e42",
+      "title": "Warehouse Inventory Control API",
+      "description": "Build a PostgreSQL REST API for warehouse inventory. Implement POST /products to create products with sku, name, and stock. Implement GET /products/:id to fetch a product by id. Implement PATCH /products/:id/stock to update stock. Implement GET /products/low-stock/:threshold to list products where stock is less than or equal to threshold. Return 404 if product is not found.",
+      "difficulty": "PRO",
+      "tags": [
+        "postgresql",
+        "inventory",
+        "backend",
+        "crud"
+      ],
+      "entryFile": "index",
+      "services": [
+        "REST",
+        "POSTGRES"
+      ],
+      "keys": {
+        "PORT": "***",
+        "PG_URI": "***"
+      },
+      "timeLimitSeconds": 7,
+      "memoryLimitMB": 256,
+      "cpuLimit": 0.5,
+      "isActive": true,
+      "createdAt": "2026-03-28T13:00:38.763968300Z"
+    }
+  },
+  "MESSAGE": "Successfully created problem",
+  "STATUS": 201,
+  "ERROR": ""
+}

@@ -6,6 +6,7 @@ import com.devpro.problem_service.model.CustomResponse;
 import com.devpro.problem_service.model.Problem;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +18,7 @@ import com.devpro.problem_service.service.ProblemService;
 public class ProblemController {
 
     private final ProblemService service;
+    private static final String HEADER_NAME = "X-User-Id";
 
     public ProblemController(ProblemService service) {
         this.service = service;
@@ -35,8 +37,12 @@ public class ProblemController {
 
     // READ ALL
     @GetMapping
-    public CustomResponse getAll() {
-        return service.getAll();
+    public CustomResponse getAll(HttpServletRequest request) {
+        String userId = request.getHeader(HEADER_NAME);
+        if(userId == null){
+            return new CustomResponse(null, "UnAuthenticated User", 401, null);
+        }
+        return service.getAll(userId);
     }
 
     // READ BY ID
