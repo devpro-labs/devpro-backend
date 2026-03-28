@@ -141,7 +141,7 @@ public class CodeRunnerService implements ICodeRunner {
             // Store metadata
             redisTemplate.opsForValue().set(dataKey, json);
             //store ttl
-            redisTemplate.opsForValue().set(ttlKey, "active", Duration.ofMinutes(1));
+            redisTemplate.opsForValue().set(ttlKey, "active", Duration.ofMinutes(10));
 
         } catch (Exception e) {
             log.info("Error in executeAsync: {}", e.getMessage());
@@ -152,7 +152,7 @@ public class CodeRunnerService implements ICodeRunner {
 
     @Override
     public CustomResponse submitCode(String problemId, DockerRunner dockerRunner, HttpServletRequest request) {
-
+        String executionId = UUID.randomUUID().toString();
         String userId = request.getHeader(headerName);
         if (userId == null){
             return new CustomResponse(null, "UnAuthorized User", 401, null);
@@ -165,20 +165,24 @@ public class CodeRunnerService implements ICodeRunner {
 
         Problem problem = helper.getProblemById(problemId);
 //        //docker container
-        CustomResponse response = dockerService.getPreviewURL(dockerRunner, problem, "");
+        CustomResponse response = dockerService.getPreviewURL(dockerRunner, problem, executionId);
 
         //docker - response
         Map<String, Object> data = response.getData();
-        var cid  = data.get("containerId").toString();
-        var fileId = data.get("fileId").toString();
-        var fileName = data.get("fileName").toString();
-        var url = (PreviewURL)data.get("url");
+        if(data == null){
+            return new CustomResponse(null, "Error in getting preview url", 500, "Error in getting preview url");
+        }
+        //  Create Docker container
+        String projectId  = data.get("projectId").toString();
+        String fileId = data.get("fileId").toString();
+        String fileName = data.get("fileName").toString();
+        PreviewURL url = (PreviewURL)data.get("url");
 
 
         //run code - sample and hidden testcases
-        CustomResponse customResponse = helper.codeSubmit(problemId, url, " ");
+        CustomResponse customResponse = helper.codeSubmit(problemId, url, executionId);
         //delete code
-        dockerService.deleteContainer(cid, fileId, fileName);
+        dockerService.deleteContainer(projectId, fileId, fileName);
 
         log.info("response is {}", customResponse.toString());
 

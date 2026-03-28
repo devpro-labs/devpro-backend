@@ -1,6 +1,5 @@
 package com.devpro.problem_service.service;
 
-import com.devpro.problem_service.clients.UserClient;
 import com.devpro.problem_service.clients.UserHelper;
 import com.devpro.problem_service.dto.SubmissionRequest;
 import com.devpro.problem_service.dto.ProfileUpdateRequest;
@@ -36,7 +35,7 @@ public class SubmissionService {
         try {
             log.info("Saving submission - {}", api.toString());
 
-            //get problem
+            //get a problem
             Problem problem = problemRepository.findById(api.getProblemId()).orElse(null);
 
             if(problem == null){
@@ -56,16 +55,14 @@ public class SubmissionService {
             submission.setTestcasesPassed(api.getTestcasesPassed());
             log.info("Submission created");
 
-            //submission add
-            submissionRepository.save(submission);
-
-
-            //check problem is already done or not
+            //check a problem is already done or not
             boolean isAlreadyDone = submissionRepository.existsByUserIdAndProblemId(api.getUserId(), api.getProblemId());
 
+            //submission add
+            submissionRepository.save(submission);
             //call user's api update that
             ProfileUpdateRequest request = new ProfileUpdateRequest(submission, problem, isAlreadyDone);
-            log.info("profile updated api called");
+            log.info("profile updated api called - and isAlreadyDone - {} ", isAlreadyDone);
             CustomResponse response = helper.profileUpdate(request);
 
             if (response.getError() != null){
@@ -79,11 +76,11 @@ public class SubmissionService {
         }
     }
 
-    public CustomResponse getSubmission(HttpServletRequest request, String submissionId){
+    public CustomResponse getSubmission(HttpServletRequest request, String problemId){
         try{
             String userId = request.getHeader(HEADER_NAME);
-            log.info("Getting submission by id {} for user {}", submissionId, userId);
-            List<Submission> submissions = submissionRepository.findAllByUserIdAndProblemId(userId, UUID.fromString(submissionId));
+            log.info("Getting submission by id {} for user {}", problemId, userId);
+            List<Submission> submissions = submissionRepository.findAllByUserIdAndProblemId(userId, UUID.fromString(problemId));
             return new CustomResponse(Map.of("submission", submissions), "Submissions found", 200, "");
         }catch (Exception e){
             return new CustomResponse(null, e.getMessage(), 500, "");

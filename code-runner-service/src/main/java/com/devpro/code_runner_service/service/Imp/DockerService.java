@@ -5,21 +5,22 @@ import com.devpro.code_runner_service.DTO.DockerRunner;
 import com.devpro.code_runner_service.DTO.FileNode;
 import com.devpro.code_runner_service.DTO.PreviewURL;
 import com.devpro.code_runner_service.config.socket_configs.LogWebSocketHandler;
-import com.devpro.code_runner_service.helper.TestCaseHelper;
 import com.devpro.code_runner_service.models.Problem;
 import com.devpro.code_runner_service.models.ServiceType;
 import com.devpro.code_runner_service.service.IDockerRepo;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.async.ResultCallback;
 import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
+
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
@@ -30,8 +31,8 @@ import java.util.concurrent.*;
 public class DockerService implements IDockerRepo {
 
     private final DockerClient dockerClient;
-    private final TestCaseHelper helper;
     private final LogWebSocketHandler logWebSocketHandler;
+    private final WebClient webClient;
 
     @Value("${traefik.domain}")
     private String domain;
@@ -44,10 +45,10 @@ public class DockerService implements IDockerRepo {
 
     private static final int TIME_LIMIT_SECONDS = 5; // ⏱️ change per problem
 
-    public DockerService(DockerClient dockerClient, TestCaseHelper helper, LogWebSocketHandler logWebSocketHandler) {
+    public DockerService(DockerClient dockerClient, LogWebSocketHandler logWebSocketHandler, WebClient webClient) {
         this.dockerClient = dockerClient;
-        this.helper = helper;
         this.logWebSocketHandler = logWebSocketHandler;
+        this.webClient = webClient;
     }
 
     private void runWithTimeLimit(String containerId, String command) throws Exception {
@@ -149,7 +150,7 @@ public class DockerService implements IDockerRepo {
                             @Override
                             public void onComplete() {
 
-                                // If there was collected error stack
+                                // If there was a collected error stack
                                 if (!errorBuffer.isEmpty()) {
                                     logWebSocketHandler.sendEvent(
                                             submissionId,
@@ -228,6 +229,34 @@ public class DockerService implements IDockerRepo {
         }
     }
 
+    private void execMongodb(String command) throws Exception {
+        try {
+            ProcessBuilder pb = new ProcessBuilder(
+                    "docker", "exec", "-i", "problem-mongodb",
+                    "mongosh",
+                    "-u", "user",
+                    "-p", "password",
+                    "--authenticationDatabase", "admin",
+                    "--eval", command
+            );
+            Process process = pb.start();
+
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(process.getInputStream())
+            );
+            reader.lines().forEach(System.out::println);
+
+            BufferedReader err = new BufferedReader(
+                    new InputStreamReader(process.getErrorStream())
+            );
+            err.lines().forEach(System.out::println);
+
+            process.waitFor();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
     private void createMongoDatabase(String previewId) throws Exception {
 
         String dbName = "mongo_" + previewId;
@@ -236,13 +265,13 @@ public class DockerService implements IDockerRepo {
 
         try {
             String js = String.format("""
-                    db = db.getSiblingDB('%s');
+                    db = db.getSiblingDB('admin');
                     db.createUser({
                         user: '%s',
                         pwd: '%s',
                         roles: [{ role: 'readWrite', db: '%s' }]
                     });
-                    """, dbName, dbUser, dbPass, dbName);
+                    """, dbUser, dbPass, dbName);
 
             ProcessBuilder pb = new ProcessBuilder(
                     "docker", "exec", "-i", "problem-mongodb",
@@ -313,22 +342,36 @@ public class DockerService implements IDockerRepo {
         dockerClient.execStartCmd(id).start().awaitCompletion();
     }
 
-    private void waitForServer(int port) throws Exception {
-        int retries = 25;
-        while (retries-- > 0) {
-            try {
-                HttpURLConnection con =
-                        (HttpURLConnection) new URL("http://localhost:" + port).openConnection();
-                con.setConnectTimeout(1000);
-                if (con.getResponseCode() < 500) return;
-            } catch (Exception ignored) {
-            }
-            Thread.sleep(1000);
-        }
-        logWebSocketHandler.sendEvent("compose-preview-1", "LOG", "Server failed to start");
-        throw new RuntimeException("Server failed to start");
-    }
+    private void waitForServer(String baseUrl, String previewId) {
+        int retries = 15;
 
+        for (int i = 0; i < retries; i++) {
+            try {
+                ResponseEntity<JsonNode> res = webClient.get()
+                        .uri(baseUrl )
+                        .exchangeToMono(response -> response.toEntity(JsonNode.class))
+                        .block();
+
+                log.info(res.toString());
+
+                if (res != null && res.getStatusCodeValue() != 400 &&  res.getStatusCodeValue() != 500) {
+
+                    log.info("✅ Server FULLY READY for {}", previewId);
+                    return;
+                }
+
+                log.warn("⏳ Waiting... {}", i + 1);
+
+            } catch (Exception e) {
+                log.warn("⏳ Waiting... {}", i + 1);
+                log.info(e.toString());
+            }
+
+            try { Thread.sleep(5000); } catch (Exception ignored) {}
+        }
+
+        throw new RuntimeException("❌ Server not ready");
+    }
     private void cleanupResources(String previewId) {
         try {
             String safeId = previewId.replace("-", "_");
@@ -343,20 +386,13 @@ public class DockerService implements IDockerRepo {
             execPostgres(String.format("DROP ROLE IF EXISTS %s;", dbUser));
 
             // 🔹 MONGODB CLEANUP
-            ProcessBuilder mongoPb = new ProcessBuilder(
-                    "docker", "exec", "-i", "problem-mongodb",
-                    "mongosh",
-                    "-u", "user",
-                    "-p", "password",
-                    "--authenticationDatabase", "admin",
-                    "--eval",
-                    String.format("""
+            execMongodb(String.format("""
                         db = db.getSiblingDB('%s');
                         db.dropDatabase();
+                    
+                        db = db.getSiblingDB('admin');
                         db.dropUser('%s');
-                        """, mongoDb, dbUser)
-            );
-            mongoPb.start().waitFor();
+                    """, mongoDb, dbUser));
 
             // 🔹 REDIS CLEANUP
             ProcessBuilder redisPb = new ProcessBuilder(
@@ -457,22 +493,22 @@ public class DockerService implements IDockerRepo {
 
                 envList.add(
                         "MONGO_URI=mongodb://" + mongoUser + ":" + mongoPass +
-                                "@mongodb:27017/" + mongoDb + "?authSource=" + mongoDb
+                                "@problem-mongodb:27017/" + mongoDb + "?authSource=admin"
                 );
             }
-//            if (services.contains(ServiceType.REDIS)) {
-//                String redisUser = "user_" + previewId;
-//                String redisPass = "pass_" + previewId;
-//                String prefix = "preview_" + previewId + ":";
-//
-//                createRedisUser(previewId);
-//
-//                envList.add("REDIS_HOST=problem-redis");
-//                envList.add("REDIS_PORT=6379");
-//                envList.add("REDIS_USERNAME=" + redisUser);
-//                envList.add("REDIS_PASSWORD=" + redisPass);
-//                envList.add("REDIS_PREFIX=" + prefix);
-//            }
+            if (services.contains(ServiceType.REDIS)) {
+                String redisUser = "user_" + previewId;
+                String redisPass = "pass_" + previewId;
+                String prefix = "preview_" + previewId + ":";
+
+                createRedisUser(previewId);
+
+                envList.add("REDIS_HOST=problem-redis");
+                envList.add("REDIS_PORT=6379");
+                envList.add("REDIS_USERNAME=" + redisUser);
+                envList.add("REDIS_PASSWORD=" + redisPass);
+                envList.add("REDIS_PREFIX=" + prefix);
+            }
 
             // 🔹 Host config
             HostConfig hostConfig = HostConfig.newHostConfig()
@@ -499,6 +535,7 @@ public class DockerService implements IDockerRepo {
             // 🔹 Start container
             dockerClient.startContainerCmd(containerId).exec();
 
+
             // 🔹 Logs
             streamContainerLogs(containerId, previewId);
 
@@ -509,12 +546,14 @@ public class DockerService implements IDockerRepo {
                     protocol + "://" + postfix_url
             );
 
-            //send env list
+            //send an env list
             logWebSocketHandler.sendEvent(
                     previewId,
                     "ENV",
                     envList
             );
+
+            waitForServer(protocol + "://" + postfix_url, previewId);
 
             // 🔹 URL (Traefik)
 //

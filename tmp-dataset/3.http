@@ -1,0 +1,90 @@
+POST http://localhost:9000/api/problems
+X-API-KEY: devpro1580
+Accept: application/json
+Content-Type: multipart/form-data; boundary=----DevProBoundary
+
+------DevProBoundary
+Content-Disposition: form-data; name="problem"
+Content-Type: application/json
+
+{
+  "title": "Palindrome Checker API",
+  "description": "Build a REST API that checks whether a given string is a palindrome. Ignore spaces and case sensitivity. Implement POST /check which takes a string and returns whether it is a palindrome. Also implement GET /health for server status.",
+  "difficulty": "CASUAL",
+  "tags": ["logic", "strings", "express"],
+  "entryFile": "index",
+  "services": ["REST"],
+  "keys": {
+    "PORT": "***"
+  },
+  "timeLimitSeconds": 5,
+  "memoryLimitMB": 128,
+  "cpuLimit": 0.2,
+
+  "testCases": [
+    {
+      "input": {
+        "text": "madam"
+      },
+      "expectedOutput": {
+        "isPalindrome": true
+      },
+      "expectedStatus": 200,
+      "isHidden": false,
+      "method": "POST",
+      "endpoint": "/check"
+    },
+    {
+      "input": {
+        "text": "race car"
+      },
+      "expectedOutput": {
+        "isPalindrome": true
+      },
+      "expectedStatus": 200,
+      "isHidden": false,
+      "method": "POST",
+      "endpoint": "/check"
+    },
+    {
+      "input": {
+        "text": "hello"
+      },
+      "expectedOutput": {
+        "isPalindrome": false
+      },
+      "expectedStatus": 200,
+      "isHidden": false,
+      "method": "POST",
+      "endpoint": "/check"
+    },
+    {
+      "input": {},
+      "expectedOutput": {
+        "message": "Health OK"
+      },
+      "expectedStatus": 200,
+      "isHidden": true,
+      "method": "GET",
+      "endpoint": "/health"
+    }
+  ]
+}
+
+
+------DevProBoundary
+Content-Disposition: form-data; name="composeFiles"; filename="express-js-compose.yml"
+Content-Type: application/x-yaml
+
+< ./1/express-js-compose.yml
+------DevProBoundary
+Content-Disposition: form-data; name="composeFiles"; filename="express-ts-compose.yml"
+Content-Type: application/x-yaml
+
+< ./1/express-js-compose.yml
+------DevProBoundary
+Content-Disposition: form-data; name="composeFiles"; filename="fatspai-py.yml"
+Content-Type: application/x-yaml
+
+< ./1/express-js-compose.yml
+------DevProBoundary--

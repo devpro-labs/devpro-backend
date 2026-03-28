@@ -1,0 +1,87 @@
+POST http://localhost:9000/api/problems
+X-API-KEY: devpro1580
+Accept: application/json
+Content-Type: multipart/form-data; boundary=----DevProBoundary
+
+------DevProBoundary
+Content-Disposition: form-data; name="problem"
+Content-Type: application/json
+
+{
+"title": "Basic REST API with MongoDB",
+"description": "Build a REST API using MongoDB. Implement POST /users to create a user, GET /users/:id to fetch a user by ObjectId, and GET /health to check server status. Return 404 if user not found.",
+"difficulty": "CASUAL",
+"tags": ["mongodb", "backend", "crud", "express"],
+"entryFile": "index",
+"services": ["REST", "MONGODB"],
+"keys": {
+"PORT": "***",
+"MONGO_URI": "***"
+},
+"timeLimitSeconds": 5,
+"memoryLimitMB": 256,
+"cpuLimit": 0.5,
+
+"testCases": [
+{
+"input": {
+"name": "John Doe"
+},
+"expectedOutput": {
+"name": "John Doe"
+},
+"expectedStatus": 201,
+"isHidden": false,
+"method": "POST",
+"endpoint": "/users"
+},
+{
+"input": {},
+"expectedOutput": {
+"name": "John Doe"
+},
+"expectedStatus": 200,
+"isHidden": false,
+"method": "GET",
+"endpoint": "/users/:id",
+"usePreviousId": true
+},
+{
+"input": {},
+"expectedOutput": {
+"error": "User not found"
+},
+"expectedStatus": 404,
+"isHidden": true,
+"method": "GET",
+"endpoint": "/users/invalid-id"
+},
+{
+"input": {},
+"expectedOutput": {
+"message": "Health OK"
+},
+"expectedStatus": 200,
+"isHidden": true,
+"method": "GET",
+"endpoint": "/health"
+}
+]
+}
+
+------DevProBoundary
+Content-Disposition: form-data; name="composeFiles"; filename="express-js-compose.yml"
+Content-Type: application/x-yaml
+
+< ./1/express-js-compose.yml
+------DevProBoundary
+Content-Disposition: form-data; name="composeFiles"; filename="express-ts-compose.yml"
+Content-Type: application/x-yaml
+
+< ./1/express-js-compose.yml
+------DevProBoundary
+Content-Disposition: form-data; name="composeFiles"; filename="fatspai-py.yml"
+Content-Type: application/x-yaml
+
+< ./1/express-js-compose.yml
+------DevProBoundary--

@@ -61,6 +61,13 @@ public class UserService {
             );
         }
 
+        User exitsuser = userRepository.findByEmail(email).orElse(null);
+
+        if(exitsuser != null){
+            userRepository.delete(exitsuser);
+            profileRepository.deleteByUserId(userId);
+        }
+
         User user = new User();
         user.setId(userId);
         user.setEmail(email);
@@ -74,6 +81,30 @@ public class UserService {
                 201,
                 null
         );
+    }
+
+    private void helperCreateProfile(String userId){
+        try{
+            Profile p = new Profile();
+            p.setUserId(userId);
+            p.setTagStats(new HashMap<>());
+            p.setFrameworkStats(new HashMap<>());
+            p.setYearlyActivity(new HashMap<>());
+            p.setTotalSolved(0L);
+            p.setProSolved(0L);
+            p.setCasualSolved(0L);
+            p.setPro_maxSolved(0L);
+            p.setEngineeringSolved(0L);
+            p.setTotalSubmissions(0L);
+            p.setCurrentStreak(0);
+            p.setMaxStreak(0);
+            p.setProfileViews(0L);
+            p.setLastSubmissionAt(null);
+
+            profileRepository.save(p);
+        }catch (Exception e){
+            log.error("Error while creating profile", e);
+        }
     }
 
 
@@ -94,7 +125,10 @@ public class UserService {
             JsonNode data = root.get("data");
 
             if ("user.created".equals(eventType)) {
-                return helperCreateUser(data);
+                Response res =  helperCreateUser(data);
+                //create profile
+                helperCreateProfile(data.get("id").asText());
+                return res;
             }
         } catch (Exception e) {
             log.warn("user checking failed - {}", e.getMessage());
@@ -152,25 +186,10 @@ public class UserService {
             String userId = submission.getUserId();
 
             // Fetch or create profile
-            Profile profile = profileRepository.findByUserId(userId)
-                    .orElseGet(() -> {
-                        Profile p = new Profile();
-                        p.setUserId(userId);
-                        p.setTagStats(new HashMap<>());
-                        p.setFrameworkStats(new HashMap<>());
-                        p.setYearlyActivity(new HashMap<>());
-                        p.setTotalSolved(0L);
-                        p.setProSolved(0L);
-                        p.setCasualSolved(0L);
-                        p.setPro_maxSolved(0L);
-                        p.setEngineeringSolved(0L);
-                        p.setTotalSubmissions(0L);
-                        p.setCurrentStreak(0);
-                        p.setMaxStreak(0);
-                        p.setProfileViews(0L);
-                        p.setLastSubmissionAt(null);
-                        return p;
-                    });
+            Profile profile = profileRepository.findByUserId(userId).orElse(null);
+            if(profile == null){
+                return new Response(null, "Profile not found", 404, "Profile not found");
+            }
 
             // Always increment submission count
             profile.setTotalSubmissions(profile.getTotalSubmissions() + 1);

@@ -4,6 +4,482 @@ Accept: application/json
 Content-Type: multipart/form-data; boundary=----DevProBoundary
 User-Agent: IntelliJ HTTP Client/IntelliJ IDEA 2025.1.3
 Accept-Encoding: br, deflate, gzip, x-gzip
+content-length: 5845
+
+------DevProBoundary
+Content-Disposition: form-data; name="problem"
+Content-Type: application/json
+
+{
+  "title": "Palindrome Checker API",
+  "description": "Build a REST API that checks whether a given string is a palindrome. Ignore spaces and case sensitivity. Implement POST /check which takes a string and returns whether it is a palindrome. Also implement GET /health for server status.",
+  "difficulty": "CASUAL",
+  "tags": ["logic", "strings", "express"],
+  "entryFile": "index",
+  "services": ["REST"],
+  "keys": {
+    "PORT": "***"
+  },
+  "timeLimitSeconds": 5,
+  "memoryLimitMB": 128,
+  "cpuLimit": 0.2,
+
+  "testCases": [
+    {
+      "input": {
+        "text": "madam"
+      },
+      "expectedOutput": {
+        "isPalindrome": true
+      },
+      "expectedStatus": 200,
+      "isHidden": false,
+      "method": "POST",
+      "endpoint": "/check"
+    },
+    {
+      "input": {
+        "text": "race car"
+      },
+      "expectedOutput": {
+        "isPalindrome": true
+      },
+      "expectedStatus": 200,
+      "isHidden": false,
+      "method": "POST",
+      "endpoint": "/check"
+    },
+    {
+      "input": {
+        "text": "hello"
+      },
+      "expectedOutput": {
+        "isPalindrome": false
+      },
+      "expectedStatus": 200,
+      "isHidden": false,
+      "method": "POST",
+      "endpoint": "/check"
+    },
+    {
+      "input": {},
+      "expectedOutput": {
+        "message": "Health OK"
+      },
+      "expectedStatus": 200,
+      "isHidden": true,
+      "method": "GET",
+      "endpoint": "/health"
+    }
+  ]
+}
+------DevProBoundary
+Content-Disposition: form-data; name="composeFiles"; filename="express-js-compose.yml"
+Content-Type: application/x-yaml
+
+< D:\DevPro-lab\devpro-backend\tmp-dataset\1\express-js-compose.yml
+------DevProBoundary
+Content-Disposition: form-data; name="composeFiles"; filename="express-ts-compose.yml"
+Content-Type: application/x-yaml
+
+< D:\DevPro-lab\devpro-backend\tmp-dataset\1\express-js-compose.yml
+------DevProBoundary
+Content-Disposition: form-data; name="composeFiles"; filename="fatspai-py.yml"
+Content-Type: application/x-yaml
+
+< D:\DevPro-lab\devpro-backend\tmp-dataset\1\express-js-compose.yml
+------DevProBoundary--
+
+<> 2026-03-27T210943.200.json
+
+###
+
+POST http://localhost:9000/api/problems
+X-API-KEY: devpro1580
+Accept: application/json
+Content-Type: multipart/form-data; boundary=----DevProBoundary
+User-Agent: IntelliJ HTTP Client/IntelliJ IDEA 2025.1.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+content-length: 5840
+
+------DevProBoundary
+Content-Disposition: form-data; name="problem"
+Content-Type: application/json
+
+{
+  "title": "Palindrome Checker API",
+  "description": "Build a REST API that checks whether a given string is a palindrome. Ignore spaces and case sensitivity. Implement POST /check which takes a string and returns whether it is a palindrome. Also implement GET /health for server status.",
+  "difficulty": "EASY",
+  "tags": ["logic", "strings", "express"],
+  "entryFile": "index",
+  "services": ["REST"],
+  "keys": {
+    "PORT": "***"
+  },
+  "timeLimitSeconds": 5,
+  "memoryLimitMB": 128,
+  "cpuLimit": 0.2,
+
+  "testCases": [
+    {
+      "input": {
+        "text": "madam"
+      },
+      "expectedOutput": {
+        "isPalindrome": true
+      },
+      "expectedStatus": 200,
+      "isHidden": false,
+      "method": "POST",
+      "endpoint": "/check"
+    },
+    {
+      "input": {
+        "text": "race car"
+      },
+      "expectedOutput": {
+        "isPalindrome": true
+      },
+      "expectedStatus": 200,
+      "isHidden": false,
+      "method": "POST",
+      "endpoint": "/check"
+    },
+    {
+      "input": {
+        "text": "hello"
+      },
+      "expectedOutput": {
+        "isPalindrome": false
+      },
+      "expectedStatus": 200,
+      "isHidden": false,
+      "method": "POST",
+      "endpoint": "/check"
+    },
+    {
+      "input": {},
+      "expectedOutput": {
+        "message": "Health OK"
+      },
+      "expectedStatus": 200,
+      "isHidden": true,
+      "method": "GET",
+      "endpoint": "/health"
+    }
+  ]
+}
+------DevProBoundary
+Content-Disposition: form-data; name="composeFiles"; filename="express-js-compose.yml"
+Content-Type: application/x-yaml
+
+< D:\DevPro-lab\devpro-backend\tmp-dataset\1\express-js-compose.yml
+------DevProBoundary
+Content-Disposition: form-data; name="composeFiles"; filename="express-ts-compose.yml"
+Content-Type: application/x-yaml
+
+< D:\DevPro-lab\devpro-backend\tmp-dataset\1\express-js-compose.yml
+------DevProBoundary
+Content-Disposition: form-data; name="composeFiles"; filename="fatspai-py.yml"
+Content-Type: application/x-yaml
+
+< D:\DevPro-lab\devpro-backend\tmp-dataset\1\express-js-compose.yml
+------DevProBoundary--
+
+<> 2026-03-27T210806.500.json
+
+###
+
+POST http://localhost:9000/api/problems
+X-API-KEY: devpro1580
+Accept: application/json
+Content-Type: multipart/form-data; boundary=----DevProBoundary
+User-Agent: IntelliJ HTTP Client/IntelliJ IDEA 2025.1.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+content-length: 5540
+
+------DevProBoundary
+Content-Disposition: form-data; name="problem"
+Content-Type: application/json
+
+{
+"title": "Basic REST API with MongoDB",
+"description": "Build a REST API using MongoDB. Implement POST /users to create a user, GET /users/:id to fetch a user by ObjectId, and GET /health to check server status. Return 404 if user not found.",
+"difficulty": "CASUAL",
+"tags": ["mongodb", "backend", "crud", "express"],
+"entryFile": "index",
+"services": ["REST", "MONGODB"],
+"keys": {
+"PORT": "***",
+"MONGO_URI": "***"
+},
+"timeLimitSeconds": 5,
+"memoryLimitMB": 256,
+"cpuLimit": 0.5,
+
+"testCases": [
+{
+"input": {
+"name": "John Doe"
+},
+"expectedOutput": {
+"name": "John Doe"
+},
+"expectedStatus": 201,
+"isHidden": false,
+"method": "POST",
+"endpoint": "/users"
+},
+{
+"input": {},
+"expectedOutput": {
+"name": "John Doe"
+},
+"expectedStatus": 200,
+"isHidden": false,
+"method": "GET",
+"endpoint": "/users/:id",
+"usePreviousId": true
+},
+{
+"input": {},
+"expectedOutput": {
+"error": "User not found"
+},
+"expectedStatus": 404,
+"isHidden": true,
+"method": "GET",
+"endpoint": "/users/invalid-id"
+},
+{
+"input": {},
+"expectedOutput": {
+"message": "Health OK"
+},
+"expectedStatus": 200,
+"isHidden": true,
+"method": "GET",
+"endpoint": "/health"
+}
+]
+}
+------DevProBoundary
+Content-Disposition: form-data; name="composeFiles"; filename="express-js-compose.yml"
+Content-Type: application/x-yaml
+
+< D:\DevPro-lab\devpro-backend\tmp-dataset\1\express-js-compose.yml
+------DevProBoundary
+Content-Disposition: form-data; name="composeFiles"; filename="express-ts-compose.yml"
+Content-Type: application/x-yaml
+
+< D:\DevPro-lab\devpro-backend\tmp-dataset\1\express-js-compose.yml
+------DevProBoundary
+Content-Disposition: form-data; name="composeFiles"; filename="fatspai-py.yml"
+Content-Type: application/x-yaml
+
+< D:\DevPro-lab\devpro-backend\tmp-dataset\1\express-js-compose.yml
+------DevProBoundary--
+
+<> 2026-03-27T153811.200.json
+
+###
+
+POST http://localhost:9000/api/problems
+X-API-KEY: devpro1580
+Accept: application/json
+Content-Type: multipart/form-data; boundary=----DevProBoundary
+User-Agent: IntelliJ HTTP Client/IntelliJ IDEA 2025.1.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+content-length: 5956
+
+------DevProBoundary
+Content-Disposition: form-data; name="problem"
+Content-Type: application/json
+
+{
+  "title": "Basic REST API with MongoDB",
+  "description": "Build a REST API using MongoDB as the primary database. Create a GET /users/:id endpoint that fetches user data from MongoDB. If the user exists, return the user object. If not, return a 404 error. Also implement a POST /users endpoint to create a new user and a GET /health endpoint to verify server status.",
+  "difficulty": "CASUAL",
+  "tags": ["mongodb", "backend", "database", "crud"],
+  "entryFile": "index",
+  "services": ["REST", "MONGODB"],
+  "keys": {
+    "PORT": "***",
+    "MONGO_URI": "***"
+  },
+  "timeLimitSeconds": 5,
+  "memoryLimitMB": 256,
+  "cpuLimit": 0.5,
+
+  "testCases": [
+    {
+      "input": {
+        "name": "John Doe"
+      },
+      "expectedOutput": {
+        "_id": "any",
+        "name": "John Doe"
+      },
+      "expectedStatus": 201,
+      "isHidden": false,
+      "method": "POST",
+      "endpoint": "/users"
+    },
+    {
+      "input": {},
+      "expectedOutput": {
+        "_id": "any",
+        "name": "John Doe"
+      },
+      "expectedStatus": 200,
+      "isHidden": false,
+      "method": "GET",
+      "endpoint": "/users/1"
+    },
+    {
+      "input": {},
+      "expectedOutput": {
+        "error": "User not found"
+      },
+      "expectedStatus": 404,
+      "isHidden": true,
+      "method": "GET",
+      "endpoint": "/users/999"
+    },
+    {
+      "input": {},
+      "expectedOutput": {
+        "message": "Health OK"
+      },
+      "expectedStatus": 200,
+      "isHidden": true,
+      "method": "GET",
+      "endpoint": "/health"
+    }
+  ]
+}
+------DevProBoundary
+Content-Disposition: form-data; name="composeFiles"; filename="express-js-compose.yml"
+Content-Type: application/x-yaml
+
+< D:\DevPro-lab\devpro-backend\tmp-dataset\1\express-js-compose.yml
+------DevProBoundary
+Content-Disposition: form-data; name="composeFiles"; filename="express-ts-compose.yml"
+Content-Type: application/x-yaml
+
+< D:\DevPro-lab\devpro-backend\tmp-dataset\1\express-js-compose.yml
+------DevProBoundary
+Content-Disposition: form-data; name="composeFiles"; filename="fastapi-py.yml"
+Content-Type: application/x-yaml
+
+< D:\DevPro-lab\devpro-backend\tmp-dataset\1\express-js-compose.yml
+------DevProBoundary--
+
+<> 2026-03-27T115916.200.json
+
+###
+
+POST http://localhost:9000/api/problems
+X-API-KEY: devpro1580
+Accept: application/json
+Content-Type: multipart/form-data; boundary=----DevProBoundary
+User-Agent: IntelliJ HTTP Client/IntelliJ IDEA 2025.1.3
+Accept-Encoding: br, deflate, gzip, x-gzip
+content-length: 5958
+
+------DevProBoundary
+Content-Disposition: form-data; name="problem"
+Content-Type: application/json
+
+{
+  "title": "Basic REST API with MongoDB",
+  "description": "Build a REST API using MongoDB as the primary database. Create a GET /users/:id endpoint that fetches user data from MongoDB. If the user exists, return the user object. If not, return a 404 error. Also implement a POST /users endpoint to create a new user and a GET /health endpoint to verify server status.",
+  "difficulty": "BEGINNER",
+  "tags": ["mongodb", "backend", "database", "crud"],
+  "entryFile": "index",
+  "services": ["REST", "MONGODB"],
+  "keys": {
+    "PORT": "***",
+    "MONGO_URI": "***"
+  },
+  "timeLimitSeconds": 5,
+  "memoryLimitMB": 256,
+  "cpuLimit": 0.5,
+
+  "testCases": [
+    {
+      "input": {
+        "name": "John Doe"
+      },
+      "expectedOutput": {
+        "_id": "any",
+        "name": "John Doe"
+      },
+      "expectedStatus": 201,
+      "isHidden": false,
+      "method": "POST",
+      "endpoint": "/users"
+    },
+    {
+      "input": {},
+      "expectedOutput": {
+        "_id": "any",
+        "name": "John Doe"
+      },
+      "expectedStatus": 200,
+      "isHidden": false,
+      "method": "GET",
+      "endpoint": "/users/1"
+    },
+    {
+      "input": {},
+      "expectedOutput": {
+        "error": "User not found"
+      },
+      "expectedStatus": 404,
+      "isHidden": true,
+      "method": "GET",
+      "endpoint": "/users/999"
+    },
+    {
+      "input": {},
+      "expectedOutput": {
+        "message": "Health OK"
+      },
+      "expectedStatus": 200,
+      "isHidden": true,
+      "method": "GET",
+      "endpoint": "/health"
+    }
+  ]
+}
+------DevProBoundary
+Content-Disposition: form-data; name="composeFiles"; filename="express-js-compose.yml"
+Content-Type: application/x-yaml
+
+< D:\DevPro-lab\devpro-backend\tmp-dataset\1\express-js-compose.yml
+------DevProBoundary
+Content-Disposition: form-data; name="composeFiles"; filename="express-ts-compose.yml"
+Content-Type: application/x-yaml
+
+< D:\DevPro-lab\devpro-backend\tmp-dataset\1\express-js-compose.yml
+------DevProBoundary
+Content-Disposition: form-data; name="composeFiles"; filename="fastapi-py.yml"
+Content-Type: application/x-yaml
+
+< D:\DevPro-lab\devpro-backend\tmp-dataset\1\express-js-compose.yml
+------DevProBoundary--
+
+<> 2026-03-27T115847.500.json
+
+###
+
+POST http://localhost:9000/api/problems
+X-API-KEY: devpro1580
+Accept: application/json
+Content-Type: multipart/form-data; boundary=----DevProBoundary
+User-Agent: IntelliJ HTTP Client/IntelliJ IDEA 2025.1.3
+Accept-Encoding: br, deflate, gzip, x-gzip
 content-length: 5946
 
 ------DevProBoundary

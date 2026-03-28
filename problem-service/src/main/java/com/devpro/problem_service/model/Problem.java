@@ -58,10 +58,6 @@ public class Problem {
     @Column(columnDefinition = "jsonb")
     private List<ServiceType> services;
 
-    /* docker compose template for this problem */
-    @Type(JsonBinaryType.class)
-    @Column(name = "compose_file", columnDefinition = "jsonb", nullable = false)
-    private Map<String, String> composeFile;
 
     /* env */
     @Type(JsonBinaryType.class)

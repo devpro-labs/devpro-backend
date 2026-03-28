@@ -1,20 +1,16 @@
 package com.devpro.problem_service.controller;
 
-import java.util.List;
 import java.util.UUID;
 
 import com.devpro.problem_service.model.CustomResponse;
 import com.devpro.problem_service.model.Problem;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.annotation.*;
 
 import com.devpro.problem_service.dto.ProblemRequest;
 import com.devpro.problem_service.service.ProblemService;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/problems")
@@ -27,20 +23,14 @@ public class ProblemController {
     }
 
     // CREATE
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping
     public CustomResponse create(
-            @RequestPart("problem") String problemJson,
-            @RequestPart(value = "composeFiles", required = false) List<MultipartFile> composeFiles
+            @RequestPart("problem") String problemJson
     ) throws Exception {
 
         ObjectMapper mapper = new ObjectMapper();
-
         ProblemRequest problem = mapper.readValue(problemJson, ProblemRequest.class);
-
-        System.out.println("TITLE: " + problem.getTitle());
-        System.out.println("FILES: " + (composeFiles != null ? composeFiles.size() : 0));
-
-        return service.create(problem, composeFiles);
+        return service.create(problem);
     }
 
     // READ ALL
@@ -57,12 +47,11 @@ public class ProblemController {
 
     // UPDATE
     @PutMapping("/{id}")
-    public ResponseEntity<CustomResponse> update(
+    public CustomResponse update(
             @PathVariable UUID id,
-            @RequestBody ProblemRequest request) {
+            @RequestBody ProblemRequest request) throws JsonProcessingException {
 
-//        CustomResponse response = service.update(id, request);
-        return ResponseEntity.ok(null);
+        return service.update(id, request);
     }
 
 
@@ -80,50 +69,20 @@ public class ProblemController {
         return service.getByIdRaw(id);
     }
 
-    //get file url
-    @GetMapping("/{folderName}/{publicId}/url")
-    public String getPublicUrl(@PathVariable String publicId, @PathVariable String folderName){
-        System.out.println(folderName);
-        return service.getFileUrl(publicId);
-    }
-
-    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
-    public ResponseEntity<?> handleMediaTypeError(Exception e) {
-        return ResponseEntity
-                .badRequest()
-                .body("Request must be multipart/form-data");
-    }
 
     // UPDATE
-    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<CustomResponse> update(
-            @PathVariable UUID id,
-            @RequestPart("problem") String problemJson,
-            @RequestPart(value = "composeFiles", required = false) List<MultipartFile> composeFiles
-    ) throws Exception {
-
-        ObjectMapper mapper = new ObjectMapper();
-        ProblemRequest problem = mapper.readValue(problemJson, ProblemRequest.class);
-
-//        System.out.println("---- DEBUG START ----");
-//        System.out.println("ProblemRequest: " +problem);
-//        if (composeFiles == null) {
-//            System.out.println("composeFiles is NULL");
-//        } else {
-//            System.out.println("composeFiles size: " + composeFiles.size());
-
-            for (MultipartFile file : composeFiles) {
-                System.out.println("File name: " + file.getOriginalFilename());
-                System.out.println("File size: " + file.getSize());
-                System.out.println("Is empty: " + file.isEmpty());
-            }
-//        }
-
-//        System.out.println("---- DEBUG END ----");
-
-        CustomResponse response = service.update(id, problem, composeFiles);
-
-        return ResponseEntity.ok(response);
-    }
+//    @PutMapping(value = "/{id}")
+//    public ResponseEntity<CustomResponse> update(
+//            @PathVariable UUID id,
+//            @RequestPart("problem") String problemJson
+//    ) throws Exception {
+//
+//        ObjectMapper mapper = new ObjectMapper();
+//        ProblemRequest problem = mapper.readValue(problemJson, ProblemRequest.class);
+//
+//        CustomResponse response = service.update(id, problem);
+//
+//        return ResponseEntity.ok(response);
+//    }
 
 }

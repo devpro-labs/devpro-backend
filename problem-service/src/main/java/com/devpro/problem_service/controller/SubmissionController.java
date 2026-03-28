@@ -23,9 +23,9 @@ public class SubmissionController {
         return service.saveSubmission(request);
     }
 
-    @GetMapping("/{submissionId}")
-    public CustomResponse getSubmission(HttpServletRequest request,@PathVariable String submissionId){
-        log.info("Getting submission by id {}", submissionId);
-        return service.getSubmission(request, submissionId);
+    @GetMapping("/{problemId}")
+    public CustomResponse getSubmission(HttpServletRequest request,@PathVariable String problemId){
+        log.info("Getting submission by id {}", problemId);
+        return service.getSubmission(request, problemId);
     }
 }

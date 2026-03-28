@@ -1,6 +1,5 @@
 package com.devpro.problem_service.service;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -15,16 +14,14 @@ import org.springframework.stereotype.Service;
 import com.devpro.problem_service.dto.ProblemRequest;
 import com.devpro.problem_service.model.Problem;
 import com.devpro.problem_service.repository.ProblemRepository;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class ProblemService {
 
     private final ProblemRepository repository;
     private final TestCaseService testCaseService;
-    private final CloudinaryService cloudinaryService;
 
-    private void map(ProblemRequest request,Problem p,List<MultipartFile> composeFiles,boolean isUpdate) {
+    private void map(ProblemRequest request,Problem p) {
 
         p.setTitle(request.getTitle());
         p.setDescription(request.getDescription());
@@ -37,57 +34,18 @@ public class ProblemService {
         p.setEntryFile(request.getEntryFile());
         p.setMemoryLimitMB(request.getMemoryLimitMB());
         p.setTimeLimitSeconds(request.getTimeLimitSeconds());
-
-    /* =============================
-       HANDLE COMPOSE FILES
-    ============================== */
-
-        if (composeFiles != null && !composeFiles.isEmpty()) {
-
-            // If updating → delete old files first
-            if (isUpdate && p.getComposeFile() != null) {
-                cloudinaryService.deleteAllFilesByProblem(p);
-            }
-
-            Map<String, String> mp = new HashMap<>();
-
-            for (MultipartFile file : composeFiles) {
-
-                if (file == null || file.isEmpty()) continue;
-
-                String filename = file.getOriginalFilename();
-                if (filename == null) continue;
-
-                filename = filename.toLowerCase();
-
-                String uploadedId = cloudinaryService.addFile(file);
-
-                if (filename.contains("js")) {
-                    mp.put("js-express", uploadedId);
-                }
-                else if (filename.contains("ts")) {
-                    mp.put("ts-express", uploadedId);
-                }
-                else if (filename.contains("py") || filename.contains("fastapi")) {
-                    mp.put("py-fastapi", uploadedId);
-                }
-            }
-
-            p.setComposeFile(mp);
-        }
     }
 
 
-    public ProblemService(ProblemRepository repository, TestCaseService testCaseService, CloudinaryService cloudinaryService) {
+    public ProblemService(ProblemRepository repository, TestCaseService testCaseService) {
         this.repository = repository;
         this.testCaseService = testCaseService;
-        this.cloudinaryService = cloudinaryService;
     }
 
     // CREATE
-    public CustomResponse create(ProblemRequest request, List<MultipartFile> composeFiles) throws JsonProcessingException {
+    public CustomResponse create(ProblemRequest request) throws JsonProcessingException {
         Problem p = new Problem();
-        map(request, p, composeFiles, false);
+        map(request, p);
         p = repository.save(p);
 
         for (TestCaseRequest testCaseRequest : request.getTestCases()) {
@@ -162,10 +120,7 @@ public class ProblemService {
 //        );
 //    }
 
-    //get file Url - downloadable
-    public String getFileUrl(String publicId){
-        return cloudinaryService.getFile(publicId);
-    }
+
 
     //  Delete
     public CustomResponse delete(UUID id) {
@@ -173,8 +128,6 @@ public class ProblemService {
             throw new RuntimeException("Problem not found");
         }
         testCaseService.deleteByProblemId(id);
-        Problem problem = repository.getById(id);
-        cloudinaryService.deleteAllFilesByProblem(problem);
         repository.deleteById(id);
 
         return new CustomResponse(
@@ -187,13 +140,13 @@ public class ProblemService {
 
     // UPDATE
     @Transactional
-    public CustomResponse update(UUID id,ProblemRequest request,List<MultipartFile> composeFiles)
+    public CustomResponse update(UUID id,ProblemRequest request)
             throws JsonProcessingException{
 
         Problem problem = findProblemById(id);
 
         // Reuse map()
-        map(request, problem, composeFiles, true);
+        map(request, problem);
 
         // Replace testcases
         testCaseService.deleteByProblemId(id);

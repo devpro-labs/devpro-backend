@@ -1,0 +1,38 @@
+{
+  "DATA": {
+    "problem": {
+      "id": "58f9ea51-d94c-48fe-909c-efd4e19bbe0e",
+      "title": "Basic REST API with MongoDB",
+      "description": "Build a REST API using MongoDB as the primary database. Create a GET /users/:id endpoint that fetches user data from MongoDB. If the user exists, return the user object. If not, return a 404 error. Also implement a POST /users endpoint to create a new user and a GET /health endpoint to verify server status.",
+      "difficulty": "CASUAL",
+      "tags": [
+        "mongodb",
+        "backend",
+        "database",
+        "crud"
+      ],
+      "entryFile": "index",
+      "services": [
+        "REST",
+        "MONGODB"
+      ],
+      "composeFile": {
+        "py-fastapi": "devpro-dev/by4tkawf0qfyd0plrkpk",
+        "ts-express": "devpro-dev/rszaxg45ptoubsbmwzt5",
+        "js-express": "devpro-dev/kft6dqqjja2pmhzyy7ne"
+      },
+      "keys": {
+        "PORT": "***",
+        "MONGO_URI": "***"
+      },
+      "timeLimitSeconds": 5,
+      "memoryLimitMB": 256,
+      "cpuLimit": 0.5,
+      "isActive": true,
+      "createdAt": "2026-03-27T06:29:07.895071400Z"
+    }
+  },
+  "MESSAGE": "Successfully created problem",
+  "STATUS": 201,
+  "ERROR": ""
+}

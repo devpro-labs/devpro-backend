@@ -1,0 +1,34 @@
+{
+  "DATA": {
+    "problem": {
+      "id": "d1a6cc36-f892-4a1e-9099-e9b8bcf2933d",
+      "title": "Palindrome Checker API",
+      "description": "Build a REST API that checks whether a given string is a palindrome. Ignore spaces and case sensitivity. Implement POST /check which takes a string and returns whether it is a palindrome. Also implement GET /health for server status.",
+      "difficulty": "CASUAL",
+      "tags": [
+        "logic",
+        "strings",
+        "express"
+      ],
+      "entryFile": "index",
+      "services": [
+        "REST"
+      ],
+      "composeFile": {
+        "ts-express": "devpro-dev/nieftig88czhukq0a0dz",
+        "js-express": "devpro-dev/pgjq6jtdoyu1ap0mhlpv"
+      },
+      "keys": {
+        "PORT": "***"
+      },
+      "timeLimitSeconds": 5,
+      "memoryLimitMB": 128,
+      "cpuLimit": 0.2,
+      "isActive": true,
+      "createdAt": "2026-03-27T15:39:36.036326300Z"
+    }
+  },
+  "MESSAGE": "Successfully created problem",
+  "STATUS": 201,
+  "ERROR": ""
+}

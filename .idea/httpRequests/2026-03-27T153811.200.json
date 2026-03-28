@@ -1,0 +1,37 @@
+{
+  "DATA": {
+    "problem": {
+      "id": "0adfb827-a113-4839-a71b-93a74e6ad864",
+      "title": "Basic REST API with MongoDB",
+      "description": "Build a REST API using MongoDB. Implement POST /users to create a user, GET /users/:id to fetch a user by ObjectId, and GET /health to check server status. Return 404 if user not found.",
+      "difficulty": "CASUAL",
+      "tags": [
+        "mongodb",
+        "backend",
+        "crud",
+        "express"
+      ],
+      "entryFile": "index",
+      "services": [
+        "REST",
+        "MONGODB"
+      ],
+      "composeFile": {
+        "ts-express": "devpro-dev/gtg98dtwuawafaec9vz7",
+        "js-express": "devpro-dev/rki5zqrabzjghgqbo059"
+      },
+      "keys": {
+        "PORT": "***",
+        "MONGO_URI": "***"
+      },
+      "timeLimitSeconds": 5,
+      "memoryLimitMB": 256,
+      "cpuLimit": 0.5,
+      "isActive": true,
+      "createdAt": "2026-03-27T10:08:05.125784300Z"
+    }
+  },
+  "MESSAGE": "Successfully created problem",
+  "STATUS": 201,
+  "ERROR": ""
+}

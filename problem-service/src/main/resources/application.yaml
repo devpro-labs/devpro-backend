@@ -48,11 +48,3 @@ management:
 admin:
   service:
     key: ${ADMIN_SERVICE_KEY}
-
-
-#clodynairy
-cloudinary:
-  cloud-name: ${CLOUDINARY_CLOUD_NAME}
-  api-key: ${CLOUDINARY_CLOUD_API_KEY}
-  api-secret: ${CLOUDINARY_CLOUD_API_SECRET}
-  folder: ${FOLDER_NAME}

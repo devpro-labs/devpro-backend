@@ -38,16 +38,13 @@ public class TestCaseHelper {
         return problemClient.getTestCases(uuid);
     }
 
-    public String getPublicUrl(String publicId) {
-        return problemClient.getPublicUrl(publicId);
-    }
 
     public Problem getProblemById(String uuid) {
         return problemClient.getProblem(uuid);
     }
 
     public CustomResponse createSubmission(SubmissionRequest submissionRequest) {
-        log.info("Request is send...........");
+        log.info("Request is send........... - {} ", submissionRequest);
         return problemClient.saveSubmission(submissionRequest);
     }
 
@@ -58,9 +55,7 @@ public class TestCaseHelper {
                 .toList();
     }
 
-    // ---------------------------------------------------
-    // 🔥 MAIN TESTCASE EXECUTION ENGINE
-    // ---------------------------------------------------
+    // MAIN TESTCASE EXECUTION ENGINE
     private CustomResponse testCaseChecker(
             List<TestCase> testCases,
             PreviewURL url,
@@ -207,9 +202,9 @@ public class TestCaseHelper {
 
                 return new CustomResponse(
                         DATA,
-                        "Wrong Answer",
+                        "correct ans",
                         200,
-                        "Testcase " + (i + 1) + " failed"
+                        null
                 );
             }
 
@@ -246,10 +241,7 @@ public class TestCaseHelper {
         );
     }
 
-    // ---------------------------------------------------
     // PUBLIC METHODS
-    // ---------------------------------------------------
-
     public void codeRun(String problemId, PreviewURL url, String executionId) {
         List<TestCase> testCases = getSampleTestCases(problemId);
         testCaseChecker(testCases, url, true, executionId);
