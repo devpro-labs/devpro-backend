@@ -43,6 +43,9 @@ public class DockerService implements IDockerRepo {
     @Value("${traefik.protocol}")
     private String protocol;
 
+    @Value("${host}")
+    private String projectRootPath;
+
     private static final int TIME_LIMIT_SECONDS = 5; // ⏱️ change per problem
 
     public DockerService(DockerClient dockerClient, LogWebSocketHandler logWebSocketHandler, WebClient webClient) {
@@ -413,6 +416,10 @@ public class DockerService implements IDockerRepo {
 
             String projectRoot = new File(".").getCanonicalPath()
                     + "/workdir/preview-" + previewId;
+
+            if(!projectRootPath.equals("localhost")){
+                projectRoot = "/home/ubuntu/devpro-backend/workdir/preview-" + previewId;
+            }
 
             File projectDir = new File(projectRoot);
             projectDir.mkdirs();

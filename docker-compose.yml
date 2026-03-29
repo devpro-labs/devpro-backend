@@ -164,6 +164,7 @@ services:
         condition: service_healthy
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./workdir:/app/workdir
     networks:
       - devpro
 

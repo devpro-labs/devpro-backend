@@ -52,3 +52,5 @@ traefik:
   domain: ${DOMAIN}
   network: ${NETWORK:devpro-network}
   protocol: ${PROTOCOL:http}
+
+host: ${HOST}
