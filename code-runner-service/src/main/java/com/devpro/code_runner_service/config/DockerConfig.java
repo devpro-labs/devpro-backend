@@ -19,7 +19,6 @@ public class DockerConfig {
     public DockerClient dockerClient(){
         //docker config
         DockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder()
-                .withDockerHost("unix:///var/run/docker.sock")
                 .build();
 
         //docker client

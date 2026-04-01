@@ -1,0 +1,33 @@
+{
+  "DATA": {
+    "problem": {
+      "id": "b2c84244-d104-4d29-9798-4f11817d8651",
+      "title": "Clinic Appointment Booking API",
+      "description": "Build a MongoDB-backed REST API for a clinic. Implement POST /appointments to create an appointment with patientName, doctorName, slotTime, and status (default: scheduled). Implement GET /appointments/:id to fetch by ObjectId. Implement PATCH /appointments/:id/status to update status to confirmed or cancelled. Implement GET /health. Return 404 when appointment is not found.",
+      "difficulty": "CASUAL",
+      "tags": [
+        "mongodb",
+        "backend",
+        "express",
+        "health-check"
+      ],
+      "entryFile": "index",
+      "services": [
+        "REST",
+        "MONGODB"
+      ],
+      "keys": {
+        "PORT": "***",
+        "MONGO_URI": "***"
+      },
+      "timeLimitSeconds": 6,
+      "memoryLimitMB": 256,
+      "cpuLimit": 0.5,
+      "isActive": true,
+      "createdAt": "2026-03-30T14:54:57.989750781Z"
+    }
+  },
+  "MESSAGE": "Successfully created problem",
+  "STATUS": 201,
+  "ERROR": ""
+}

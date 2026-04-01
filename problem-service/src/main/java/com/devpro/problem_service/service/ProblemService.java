@@ -74,6 +74,15 @@ public class ProblemService {
     public CustomResponse getAll(String userId) {
         List<Problem> problems = repository.findAll();
 
+        if(problems.isEmpty()){
+            return new CustomResponse(
+                    Map.of(),
+                    "No problems found.",
+                     200,
+                    ""
+            );
+        }
+
         //get submissions and add to object
         List<UUID> submissions = submissionRepository.findAllProblemIdByUserIdAndStatus(userId, SubmissionStatus.ACCEPTED);
 

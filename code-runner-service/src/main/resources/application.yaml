@@ -50,7 +50,7 @@ limits:
 #proxy host for traefik
 traefik:
   domain: ${DOMAIN}
-  network: ${NETWORK:devpro-network}
+  network: ${NETWORK:devpro-backend_devpro-network}
   protocol: ${PROTOCOL:http}
 
-host: ${HOST}
+host_workdir: ${HOST_WORKDIR}

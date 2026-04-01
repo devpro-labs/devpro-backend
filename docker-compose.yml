@@ -12,7 +12,9 @@ services:
       timeout: 3s
       retries: 10
     networks:
-      - devpro
+      - devpro-network
+    labels:
+      - "traefik.http.routers.consul.rule=Host(`consul.localhost`)"
 
   postgres:
     image: postgres:16-alpine
@@ -28,7 +30,7 @@ services:
       timeout: 3s
       retries: 10
     networks:
-      - devpro
+      - devpro-network
 
   adminer:
     image: adminer:latest
@@ -38,7 +40,9 @@ services:
       postgres:
         condition: service_healthy
     networks:
-      - devpro
+      - devpro-network
+    labels:
+      - "traefik.http.routers.adminer.rule=Host(`adminer.localhost`)"
 
   redis:
     image: redis:7.2-alpine
@@ -54,7 +58,7 @@ services:
       timeout: 3s
       retries: 10
     networks:
-      - devpro
+      - devpro-network
 
   api-gateway:
     build: ./api-gateway
@@ -68,7 +72,7 @@ services:
       consul:
         condition: service_healthy
     networks:
-      - devpro
+      - devpro-network
 
   #  Traefik Reverse Proxy
   traefik:
@@ -85,7 +89,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
-      - devpro
+      - devpro-network
 
   #  Shared DBs for user code execution
   problem-postgres:
@@ -102,7 +106,7 @@ services:
       timeout: 3s
       retries: 10
     networks:
-      - devpro
+      - devpro-network
 
   problem-mongodb:
     image: mongodb-common
@@ -113,7 +117,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: password
       MONGO_INITDB_DATABASE: db
     networks:
-      - devpro
+      - devpro-network
 
   user-service:
     build: ./user-service
@@ -129,7 +133,7 @@ services:
       consul:
         condition: service_healthy
     networks:
-      - devpro
+      - devpro-network
 
   problem-service:
     build: ./problem-service
@@ -147,7 +151,7 @@ services:
       redis:
         condition: service_healthy
     networks:
-      - devpro
+      - devpro-network
 
   code-runner-service:
     build: ./code-runner-service
@@ -157,17 +161,18 @@ services:
       - "8083:8083"
     env_file:
       - .env
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${HOST_WORKDIR}:/app/workdir
+
     depends_on:
       redis:
         condition: service_healthy
       consul:
         condition: service_healthy
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ./workdir:/app/workdir
     networks:
-      - devpro
+      - devpro-network
 
 networks:
-  devpro:
+  devpro-network:
     driver: bridge

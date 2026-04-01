@@ -13,6 +13,7 @@ import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.async.ResultCallback;
 import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.model.*;
+import com.github.dockerjava.core.command.ExecStartResultCallback;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -43,8 +44,10 @@ public class DockerService implements IDockerRepo {
     @Value("${traefik.protocol}")
     private String protocol;
 
-    @Value("${host}")
-    private String projectRootPath;
+
+    @Value("${host_workdir}")
+    private String hostWorkdir;
+
 
     private static final int TIME_LIMIT_SECONDS = 5; // ⏱️ change per problem
 
@@ -107,6 +110,20 @@ public class DockerService implements IDockerRepo {
                         StandardOpenOption.CREATE,
                         StandardOpenOption.TRUNCATE_EXISTING
                 );
+            }
+        }
+    }
+
+    private void printFileNodeTree(List<FileNode> files, String indent) {
+        if (files == null) return;
+
+        for (FileNode node : files) {
+            if (node.isFolder()) {
+                System.out.println(indent + "📁 " + node.getName());
+                printFileNodeTree(node.getChildren(), indent + "  ");
+            } else {
+                int size = node.getContent() == null ? 0 : node.getContent().length();
+                System.out.println(indent + "📄 " + node.getName() + " (" + size + " chars)");
             }
         }
     }
@@ -206,58 +223,39 @@ public class DockerService implements IDockerRepo {
 
     private void execPostgres(String sql) throws Exception {
 
-        try {
-            ProcessBuilder pb = new ProcessBuilder(
-                    "docker", "exec", "-i", "problem-postgres",
-                    "psql", "-U", "user",
-                    "-d", "db",
-                    "-c", sql
-            );
+        String safeSql = sql.replace("\"", "\\\"");
 
-            Process process = pb.start();
+        String cmd = String.format(
+                "PGPASSWORD=password psql -U user -d db -c \"%s\"",
+                safeSql
+        );
 
-            BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(process.getInputStream())
-            );
-            reader.lines().forEach(System.out::println);
+        String execId = dockerClient.execCreateCmd("problem-postgres")
+                .withCmd("sh", "-c", cmd)
+                .withAttachStdout(true)
+                .withAttachStderr(true)
+                .exec()
+                .getId();
 
-            BufferedReader err = new BufferedReader(
-                    new InputStreamReader(process.getErrorStream())
-            );
-            err.lines().forEach(System.out::println);
 
-            process.waitFor();
-        } catch (Exception e) {
-            System.out.println("DB may already exist: ");
-        }
+        dockerClient.execStartCmd(execId)
+                .start()
+                .awaitCompletion();
     }
 
-    private void execMongodb(String command) throws Exception {
-        try {
-            ProcessBuilder pb = new ProcessBuilder(
-                    "docker", "exec", "-i", "problem-mongodb",
-                    "mongosh",
-                    "-u", "user",
-                    "-p", "password",
-                    "--authenticationDatabase", "admin",
-                    "--eval", command
-            );
-            Process process = pb.start();
 
-            BufferedReader reader = new BufferedReader(
-                    new InputStreamReader(process.getInputStream())
-            );
-            reader.lines().forEach(System.out::println);
+    private void execMongo(String cmd) throws Exception {
 
-            BufferedReader err = new BufferedReader(
-                    new InputStreamReader(process.getErrorStream())
-            );
-            err.lines().forEach(System.out::println);
+        String execId = dockerClient.execCreateCmd("problem-mongodb")
+                .withCmd("sh", "-c", cmd)
+                .withAttachStdout(true)
+                .withAttachStderr(true)
+                .exec()
+                .getId();
 
-            process.waitFor();
-        } catch (Exception e) {
-            System.out.println(e);
-        }
+        dockerClient.execStartCmd(execId)
+                .start()
+                .awaitCompletion();
     }
 
     private void createMongoDatabase(String previewId) throws Exception {
@@ -266,33 +264,43 @@ public class DockerService implements IDockerRepo {
         String dbUser = "user_" + previewId;
         String dbPass = "pass_" + previewId;
 
-        try {
-            String js = String.format("""
-                    db = db.getSiblingDB('admin');
-                    db.createUser({
-                        user: '%s',
-                        pwd: '%s',
-                        roles: [{ role: 'readWrite', db: '%s' }]
-                    });
-                    """, dbUser, dbPass, dbName);
+        String js = String.format("""
+        mongosh -u user -p password --authenticationDatabase admin --eval "
+        db = db.getSiblingDB('admin');
+        db.createUser({
+            user: '%s',
+            pwd: '%s',
+            roles: [{ role: 'readWrite', db: '%s' }]
+        });
+        db.test.insertOne({ init: true });
+        "
+    """, dbUser, dbPass, dbName);
 
-            ProcessBuilder pb = new ProcessBuilder(
-                    "docker", "exec", "-i", "problem-mongodb",
-                    "mongosh",
-                    "-u", "user",
-                    "-p", "password",
-                    "--authenticationDatabase", "admin",
-                    "--eval", js
-            );
+        execMongo(js);
 
-            Process process = pb.start();
-            process.waitFor();
+        System.out.println("✅ MongoDB ready: " + dbName);
+    }
 
-            System.out.println("✅ Created MongoDB user + DB: " + dbName);
+    private void waitForMongoReady(String dbName, String user, String pass) throws Exception {
 
-        } catch (Exception e) {
-            System.out.println("MongoDB may already exist: " + dbName);
+        for (int i = 0; i < 10; i++) {
+            try {
+
+                String cmd = String.format("""
+                mongosh -u %s -p %s --authenticationDatabase admin --eval "db.runCommand({ ping: 1 })"
+            """, user, pass);
+
+                execMongo(cmd);
+
+                System.out.println("✅ Mongo ready");
+                return;
+
+            } catch (Exception ignored) {}
+
+            Thread.sleep(1000);
         }
+
+        throw new RuntimeException("Mongo not ready");
     }
 
     private void createRedisUser(String previewId) throws Exception {
@@ -386,7 +394,7 @@ public class DockerService implements IDockerRepo {
             execPostgres(String.format("DROP ROLE IF EXISTS %s;", dbUser));
 
             // 🔹 MONGODB CLEANUP
-            execMongodb(String.format("""
+            execMongo(String.format("""
                         db = db.getSiblingDB('%s');
                         db.dropDatabase();
                     
@@ -408,32 +416,58 @@ public class DockerService implements IDockerRepo {
             log.error("Cleanup failed for {}", previewId, e);
         }
     }
+    private void printFileTree(Path root) throws IOException {
+        if (!Files.exists(root)) {
+            System.out.println("❌ Path does not exist: " + root);
+            return;
+        }
+
+        Files.walk(root)
+                .forEach(path -> {
+                    try {
+                        String indent = "  ".repeat(root.relativize(path).getNameCount());
+                        if (Files.isDirectory(path)) {
+                            System.out.println(indent + "📁 " + path.getFileName());
+                        } else {
+                            System.out.println(indent + "📄 " + path.getFileName() +
+                                    " (" + Files.size(path) + " bytes)");
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
+    }
 
     @Override
     public CustomResponse getPreviewURL(DockerRunner runner, Problem problem, String previewId) {
         try {
             System.out.println("========== PREVIEW REQUEST ==========");
 
-            String projectRoot = new File(".").getCanonicalPath()
-                    + "/workdir/preview-" + previewId;
+            //input file
+            printFileNodeTree(runner.getFiles(), "");
 
-            if(!projectRootPath.equals("localhost")){
-                projectRoot = "/home/ubuntu/devpro-backend/workdir/preview-" + previewId;
-            }
+            String basePath = "/app/workdir";
+
+            String projectRoot = Paths.get(basePath, "preview-" + previewId).toString();
+
+            //root path
+            System.out.println("root path is " + projectRoot);
 
             File projectDir = new File(projectRoot);
             projectDir.mkdirs();
 
-            Path projectRootPath = projectDir.toPath();
 
-            // 🔹 Write project files
-            writeFileTree(runner.getFiles(), projectRootPath);
+            writeFileTree(runner.getFiles(), projectDir.toPath());
+            //write files into file
+            System.out.println("files are written");
 
+            //get image and container
             String image = runner.getImage_name();
             String containerName = "preview-" + previewId;
 
             // 🔹 Ensure image exists
             try {
+                //inspect image
                 dockerClient.inspectImageCmd(image).exec();
             } catch (Exception e) {
                 dockerClient.pullImageCmd(image).start().awaitCompletion();
@@ -441,6 +475,7 @@ public class DockerService implements IDockerRepo {
 
             // envList
             List<String> envList = new ArrayList<>();
+            envList.add("PORT=3000");
 
             // 🔹 Traefik labels
             Map<String, String> labels = new HashMap<>();
@@ -449,6 +484,14 @@ public class DockerService implements IDockerRepo {
             // Router
             labels.put("traefik.http.routers." + containerName + ".rule",
                     "Host(`" + postfix_url + "`)");
+            labels.put(
+                    "traefik.http.services." + containerName + ".loadbalancer.server.port",
+                    "3000"
+            );
+            labels.put("traefik.enable", "true");
+            labels.put("traefik.docker.network", network);
+
+            System.out.println("labels are "+ labels);
 
 
             //create db
@@ -494,6 +537,7 @@ public class DockerService implements IDockerRepo {
                 String mongoPass = "pass_" + safeId;
 
                 createMongoDatabase(safeId);
+                waitForMongoReady(mongoDb, mongoUser, mongoPass);
 
                 envList.add(
                         "MONGO_URI=mongodb://" + mongoUser + ":" + mongoPass +
@@ -514,9 +558,17 @@ public class DockerService implements IDockerRepo {
 //                envList.add("REDIS_PREFIX=" + prefix);
 //            }
 
+            String hostProjectRoot = Paths.get(hostWorkdir, "preview-" + previewId).toString();
+            System.out.println("host path is " + hostProjectRoot);
+
             // 🔹 Host config
             HostConfig hostConfig = HostConfig.newHostConfig()
-                    .withBinds(new Bind(projectRoot + "/src", new Volume("/app/src")))
+                    .withBinds(
+                            new Bind(
+                                    hostProjectRoot + "/src",
+                                    new Volume("/app/src")
+                            )
+                    )
                     .withMemory(256L * 1024 * 1024)
                     .withMemorySwap(256L * 1024 * 1024)
                     .withCpuPeriod(100_000L)
@@ -556,8 +608,9 @@ public class DockerService implements IDockerRepo {
                     "ENV",
                     envList
             );
+            String internalUrl = "http://" + containerName + ":3000";
 
-            waitForServer(protocol + "://" + postfix_url, previewId);
+            waitForServer(internalUrl, previewId);
 
             // 🔹 URL (Traefik)
 //
@@ -572,6 +625,7 @@ public class DockerService implements IDockerRepo {
             data.put("url", url);
             data.put("fileId", previewId);
             data.put("fileName", runner.getFile_name());
+            data.put("internalUrl", internalUrl);
 
             return new CustomResponse(data, "Preview started", 200, null);
 

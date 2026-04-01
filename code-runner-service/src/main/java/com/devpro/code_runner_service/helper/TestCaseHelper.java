@@ -58,7 +58,7 @@ public class TestCaseHelper {
     // MAIN TESTCASE EXECUTION ENGINE
     private CustomResponse testCaseChecker(
             List<TestCase> testCases,
-            PreviewURL url,
+            String url,
             Boolean isSample,
             String executionId
     ) {
@@ -103,7 +103,7 @@ public class TestCaseHelper {
                 // Build request
                 WebClient.RequestBodySpec request = webClient
                         .method(httpMethod)
-                        .uri(url.getUrl() + testCase.getEndpoint())
+                        .uri(url + testCase.getEndpoint())
                         .accept(MediaType.APPLICATION_JSON);
 
                 // Only attach body for non-GET methods
@@ -242,12 +242,12 @@ public class TestCaseHelper {
     }
 
     // PUBLIC METHODS
-    public void codeRun(String problemId, PreviewURL url, String executionId) {
+    public void codeRun(String problemId, String url, String executionId) {
         List<TestCase> testCases = getSampleTestCases(problemId);
         testCaseChecker(testCases, url, true, executionId);
     }
 
-    public CustomResponse codeSubmit(String problemId, PreviewURL url, String executionId) {
+    public CustomResponse codeSubmit(String problemId, String url, String executionId) {
         List<TestCase> testCases = getTestCase(problemId);
         return testCaseChecker(testCases, url, false, executionId);
     }

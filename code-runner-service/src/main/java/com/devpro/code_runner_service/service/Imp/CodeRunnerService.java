@@ -125,10 +125,11 @@ public class CodeRunnerService implements ICodeRunner {
             String fileId = data.get("fileId").toString();
             String fileName = data.get("fileName").toString();
             PreviewURL url = (PreviewURL) data.get("url");
+            String internalUrl = data.get("internalUrl").toString();
 
 
             // Run testcases (this should stream logs via WS)
-            helper.codeRun(problemId, url, executionId);
+            helper.codeRun(problemId, internalUrl, executionId);
 
             //now remove lock
             redisTemplate.delete(lockKey);
@@ -177,10 +178,11 @@ public class CodeRunnerService implements ICodeRunner {
         String fileId = data.get("fileId").toString();
         String fileName = data.get("fileName").toString();
         PreviewURL url = (PreviewURL)data.get("url");
+        String internalUrl = data.get("internalUrl").toString();
 
 
         //run code - sample and hidden testcases
-        CustomResponse customResponse = helper.codeSubmit(problemId, url, executionId);
+        CustomResponse customResponse = helper.codeSubmit(problemId, internalUrl, executionId);
         //delete code
         dockerService.deleteContainer(projectId, fileId, fileName);
 
