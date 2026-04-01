@@ -446,9 +446,8 @@ public class DockerService implements IDockerRepo {
             //input file
             printFileNodeTree(runner.getFiles(), "");
 
-            String basePath = "/app/workdir";
 
-            String projectRoot = Paths.get(basePath, "preview-" + previewId).toString();
+            String projectRoot = Paths.get(hostWorkdir, "preview-" + previewId).toString();
 
             //root path
             System.out.println("root path is " + projectRoot);
@@ -558,14 +557,13 @@ public class DockerService implements IDockerRepo {
 //                envList.add("REDIS_PREFIX=" + prefix);
 //            }
 
-            String hostProjectRoot = Paths.get(hostWorkdir, "preview-" + previewId).toString();
-            System.out.println("host path is " + hostProjectRoot);
+
 
             // 🔹 Host config
             HostConfig hostConfig = HostConfig.newHostConfig()
                     .withBinds(
                             new Bind(
-                                    hostProjectRoot + "/src",
+                                    projectRoot + "/src",
                                     new Volume("/app/src")
                             )
                     )
